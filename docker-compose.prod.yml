@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: generosity-pays-prod
+    ports:
+      - "80:3000"
+    volumes:
+      - prod-data:/app/data
+      - prod-uploads:/app/uploads
+      - prod-backups:/app/backups
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  prod-data:
+  prod-uploads:
+  prod-backups:

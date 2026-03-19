@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Brand colors — Generosity Pays logo */
+  --color-primary: #C4A265;
+  --color-primary-dark: #A8893F;
+  --color-primary-light: #D4B87A;
+  --color-secondary: #1A1714;
+  --color-secondary-dark: #0F0D0B;
+  --color-accent: #D4B87A;
+  --color-warm: #F5F0EB;
+  --color-warm-dark: #EDE5DB;
+  --color-muted: #9C9083;
+  --color-dark: #1A1714;
+  --color-dark-light: #2D2A26;
+  --color-gray-50: #FAF8F6;
+  --color-gray-100: #F5F0EB;
+  --color-gray-200: #E8E0D8;
+  --color-gray-300: #D4CCC2;
+  --color-gray-400: #9C9083;
+  --color-gray-500: #6B6259;
+  --color-gray-600: #4A4339;
+  --color-gray-700: #2D2A26;
+  --color-gray-800: #1A1714;
+  --color-gray-900: #0F0D0B;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #FAF8F6;
+  color: #1A1714;
+  font-family: var(--font-sans);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F5F0EB;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4CCC2;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9C9083;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(196, 162, 101, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(196, 162, 101, 0.6); }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }

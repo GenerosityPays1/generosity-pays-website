@@ -1,0 +1,5 @@
+# Daily database backup at 2:00 AM
+0 2 * * * /bin/bash /app/scripts/backup-db.sh >> /app/backups/backup.log 2>&1
+
+# Weekly full backup on Sunday at 3:00 AM
+0 3 * * 0 /bin/bash /app/scripts/backup-full.sh >> /app/backups/backup.log 2>&1
