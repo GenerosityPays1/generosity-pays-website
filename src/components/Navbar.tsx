@@ -60,7 +60,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" onClick={closeMobile}>
             <Image
-              src="/logo.png"
+              src="/TransparentLogo.png"
               alt="Generosity Pays"
               width={48}
               height={48}
@@ -154,7 +154,7 @@ export default function Navbar() {
               <div className="flex h-[70px] items-center justify-between border-b border-gray-100 px-5">
                 <span className="flex items-center gap-2">
                   <Image
-                    src="/logo.png"
+                    src="/TransparentLogo.png"
                     alt="Generosity Pays"
                     width={36}
                     height={36}

@@ -32,7 +32,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2">
               <Image
-                src="/logo.png"
+                src="/TransparentLogo.png"
                 alt="Generosity Pays"
                 width={40}
                 height={40}

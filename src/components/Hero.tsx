@@ -104,7 +104,7 @@ export default function Hero() {
         {/* Logo mark */}
         <motion.div variants={fadeUpVariants} className="mb-6">
           <Image
-            src="/logo.png"
+            src="/TransparentLogo.png"
             alt=""
             width={96}
             height={96}
