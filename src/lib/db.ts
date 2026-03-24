@@ -4,7 +4,10 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'generosity-pays.db');
+// On Vercel, the project filesystem is read-only — use /tmp for the database
+const DB_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'generosity-pays.db')
+  : path.join(process.cwd(), 'data', 'generosity-pays.db');
 
 let _db: Database.Database | null = null;
 
