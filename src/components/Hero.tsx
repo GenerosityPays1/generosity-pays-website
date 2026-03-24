@@ -101,15 +101,15 @@ export default function Hero() {
         initial="hidden"
         animate="visible"
       >
-        {/* Logo */}
+        {/* Logo mark */}
         <motion.div variants={fadeUpVariants} className="mb-6">
           <Image
-            src="/TransparentLogo.png"
+            src="/logo.png"
             alt=""
-            width={200}
-            height={200}
+            width={96}
+            height={96}
             priority
-            className="h-24 w-auto drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+            className="h-20 w-20 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
             style={{ filter: "brightness(0) invert(1)" }}
           />
         </motion.div>

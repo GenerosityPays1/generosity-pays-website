@@ -30,14 +30,17 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Company Info */}
           <div>
-            <Image
-              src="/TransparentLogo.png"
-              alt="Generosity Pays — Merchant Services"
-              width={160}
-              height={160}
-              className="h-16 w-auto rounded-lg bg-white/10 p-1"
-              style={{ filter: "brightness(0) invert(1)" }}
-            />
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logo.png"
+                alt="Generosity Pays"
+                width={40}
+                height={40}
+                className="h-9 w-9 object-contain"
+                style={{ filter: "brightness(0) invert(1)" }}
+              />
+              <h3 className="text-2xl font-bold text-white">Generosity Pays</h3>
+            </div>
             <p className="mt-4 text-sm leading-relaxed text-gray-400">
               Premium payment processing with purpose. Every transaction
               supports charitable causes that make a difference — at no

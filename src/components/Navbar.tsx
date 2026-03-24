@@ -58,15 +58,19 @@ export default function Navbar() {
       >
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center" onClick={closeMobile}>
+          <Link href="/" className="flex items-center gap-2" onClick={closeMobile}>
             <Image
-              src="/TransparentLogo.png"
-              alt="Generosity Pays — Merchant Services"
-              width={200}
-              height={200}
+              src="/logo.png"
+              alt="Generosity Pays"
+              width={48}
+              height={48}
               priority
-              className="h-[52px] w-auto object-contain"
+              className="h-10 w-10 object-contain"
             />
+            <span className="text-xl font-semibold tracking-tight font-serif">
+              <span className={scrolled ? "text-dark" : "text-white"}>Generosity</span>
+              <span className={`italic ${scrolled ? "text-dark" : "text-white"}`}> Pays</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -76,7 +80,9 @@ export default function Navbar() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-primary/5 hover:text-primary"
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
+                    scrolled ? "text-gray-700 hover:bg-primary/5" : "text-white/90 hover:bg-white/10"
+                  }`}
                 >
                   {link.label}
                 </a>
@@ -84,7 +90,9 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-primary/5 hover:text-primary"
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
+                    scrolled ? "text-gray-700 hover:bg-primary/5" : "text-white/90 hover:bg-white/10"
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -105,7 +113,9 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 transition-colors hover:bg-gray-100 lg:hidden"
+              className={`inline-flex items-center justify-center rounded-lg p-2 transition-colors lg:hidden ${
+                scrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white/10"
+              }`}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               {mobileOpen ? (
@@ -142,14 +152,17 @@ export default function Navbar() {
             >
               {/* Drawer Header */}
               <div className="flex h-[70px] items-center justify-between border-b border-gray-100 px-5">
-                <span className="flex items-center">
+                <span className="flex items-center gap-2">
                   <Image
-                    src="/TransparentLogo.png"
+                    src="/logo.png"
                     alt="Generosity Pays"
-                    width={160}
-                    height={160}
-                    className="h-[44px] w-auto object-contain"
+                    width={36}
+                    height={36}
+                    className="h-8 w-8 object-contain"
                   />
+                  <span className="text-lg font-semibold tracking-tight font-serif text-dark">
+                    Generosity <span className="italic">Pays</span>
+                  </span>
                 </span>
                 <button
                   type="button"
