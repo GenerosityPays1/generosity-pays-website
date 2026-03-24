@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import {
-  HiCurrencyDollar,
+  HiShieldCheck,
   HiEye,
   HiHeart,
   HiSupport,
@@ -21,10 +21,10 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    title: "Lower Processing Fees",
+    title: "Premium Processing",
     description:
-      "We negotiate the best rates so you keep more of your revenue.",
-    icon: HiCurrencyDollar,
+      "Reliable, high-quality payment processing built for businesses that expect the best.",
+    icon: HiShieldCheck,
   },
   {
     title: "Transparent Pricing",
@@ -35,7 +35,7 @@ const features: Feature[] = [
   {
     title: "Charitable Impact",
     description:
-      "A portion of every transaction supports charitable causes.",
+      "Every transaction supports charitable causes — at no additional cost to your business.",
     icon: HiHeart,
   },
   {
@@ -98,7 +98,7 @@ export default function Features() {
             Why Choose Generosity Pays
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-500">
-            Everything you need for better payment processing
+            Reliable service, transparent pricing, and a mission that matters
           </p>
         </motion.div>
 
@@ -147,14 +147,14 @@ export default function Features() {
           className="mt-16 text-center"
         >
           <p className="mb-6 text-xl font-medium text-gray-700">
-            Ready to start saving?
+            Ready to make an impact?
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
             <Link
               href="/merchant-fee-analysis"
               className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-lg font-semibold text-dark shadow-lg shadow-primary/30 transition-colors duration-300 hover:bg-primary-dark"
             >
-              Free Fee Analysis
+              Get Your Free Analysis
             </Link>
           </motion.div>
         </motion.div>

@@ -83,7 +83,7 @@ export default function Contact() {
             Get In Touch
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-500">
-            Have questions? We&apos;d love to hear from you.
+            We&apos;d love to learn about your business and how we can help.
           </p>
         </motion.div>
 
@@ -113,10 +113,10 @@ export default function Contact() {
               Let&apos;s Start A Conversation
             </h3>
             <p className="mb-8 leading-relaxed text-gray-500">
-              Ready to see how much your business could save? Book a free
-              consultation with our team and we&apos;ll walk you through a
-              personalized fee analysis. No obligation, no pressure -- just
-              honest answers about your payment processing.
+              Curious how Generosity Pays can work for your business? Connect
+              with our team for a complimentary consultation. We&apos;ll review
+              your current processing setup and show you how every transaction
+              can support the causes you care about. No obligation, no pressure.
             </p>
 
             <div className="space-y-6">

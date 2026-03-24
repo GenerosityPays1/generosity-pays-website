@@ -31,9 +31,9 @@ export default function Footer() {
           <div>
             <h3 className="text-2xl font-bold text-white">Generosity Pays</h3>
             <p className="mt-4 text-sm leading-relaxed text-gray-400">
-              Turning payment processing into a force for good. We help
-              businesses reduce fees while supporting charitable causes that
-              make a difference.
+              Premium payment processing with purpose. Every transaction
+              supports charitable causes that make a difference — at no
+              additional cost to your business.
             </p>
             <div className="mt-6 flex gap-4">
               {socialLinks.map(({ icon: Icon, href, label }) => (
@@ -101,7 +101,7 @@ export default function Footer() {
       <div className="border-t border-gray-700">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-muted">
-            &copy; 2024 Generosity Pays. All rights reserved.
+            &copy; 2025 Generosity Pays. All rights reserved.
           </p>
         </div>
       </div>

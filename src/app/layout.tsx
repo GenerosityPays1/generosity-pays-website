@@ -8,15 +8,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Generosity Pays | Turn Payment Processing Into A Force For Good",
+  title: "Generosity Pays | Premium Payment Processing With Purpose",
   description:
-    "Reduce merchant fees while supporting charitable giving. Get a free fee analysis and start saving today.",
+    "High-quality payment processing that gives back. Every transaction supports charitable causes at no additional cost to your business. Get a free analysis today.",
   keywords:
-    "payment processing, merchant fees, charitable giving, fee analysis, credit card processing",
+    "payment processing, charitable giving, merchant services, business impact, credit card processing, payment processing with purpose",
   openGraph: {
-    title: "Generosity Pays | Turn Payment Processing Into A Force For Good",
+    title: "Generosity Pays | Premium Payment Processing With Purpose",
     description:
-      "Reduce merchant fees while supporting charitable giving. Get a free fee analysis and start saving today.",
+      "High-quality payment processing that gives back. Every transaction supports charitable causes at no additional cost to your business. Get a free analysis today.",
     type: "website",
   },
 };

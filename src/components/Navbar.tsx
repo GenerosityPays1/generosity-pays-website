@@ -10,7 +10,7 @@ const navLinks = [
   { label: "Home", href: "#hero" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Solutions", href: "#features" },
-  { label: "Merchant Fee Analysis", href: "/merchant-fee-analysis" },
+  { label: "Free Analysis", href: "/merchant-fee-analysis" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
@@ -95,7 +95,7 @@ export default function Navbar() {
               href="/merchant-fee-analysis"
               className="hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md lg:inline-flex items-center"
             >
-              Free Fee Analysis
+              Get Your Free Analysis
             </Link>
 
             {/* Hamburger Button */}
@@ -199,7 +199,7 @@ export default function Navbar() {
                     onClick={closeMobile}
                     className="block w-full rounded-full bg-primary py-3 text-center text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md"
                   >
-                    Free Fee Analysis
+                    Get Your Free Analysis
                   </Link>
                 </motion.div>
               </div>

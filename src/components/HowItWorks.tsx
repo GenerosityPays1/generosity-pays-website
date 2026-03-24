@@ -22,16 +22,16 @@ const steps: Step[] = [
   },
   {
     number: 2,
-    title: "We Analyze Your Fees",
+    title: "We Review Your Processing",
     description:
-      "Our experts review your statement and identify savings opportunities.",
+      "Our experts review your statement to ensure you're getting the best service — and identify any savings along the way.",
     icon: HiSearch,
   },
   {
     number: 3,
-    title: "Save & Give Back",
+    title: "Process & Give Back",
     description:
-      "You save money on fees while supporting charitable giving.",
+      "Every transaction through Generosity Pays supports charitable causes — whether or not your fees change.",
     icon: HiHeart,
   },
 ];
@@ -89,7 +89,7 @@ export default function HowItWorks() {
             How It Works
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-500">
-            Three simple steps to start saving
+            Three simple steps to start giving back
           </p>
         </motion.div>
 

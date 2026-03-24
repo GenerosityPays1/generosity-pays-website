@@ -11,9 +11,9 @@ interface FAQItem {
 
 const faqItems: FAQItem[] = [
   {
-    question: "How does Generosity Pays lower fees?",
+    question: "How does the charitable giving program work?",
     answer:
-      "We leverage our network and volume to negotiate significantly lower interchange and processing rates with major card networks. Our technology identifies unnecessary fees and eliminates them, passing the savings directly to you.",
+      "Every transaction processed through Generosity Pays automatically supports charitable causes. A portion of each transaction is directed to vetted charitable organizations — at no additional cost to your business. You process payments as usual, and the giving happens behind the scenes.",
   },
   {
     question: "Do I need to switch processors?",
@@ -23,7 +23,7 @@ const faqItems: FAQItem[] = [
   {
     question: "Is the analysis really free?",
     answer:
-      "Absolutely. Our fee analysis is 100% free with no obligation. We'll review your current processing statement, identify savings opportunities, and present you with a detailed breakdown\u2014all at no cost.",
+      "Absolutely. Our analysis is 100% free with no obligation. We'll review your current processing statement so you can gain full clarity on your setup. If we identify savings opportunities, we'll share those too — all at no cost.",
   },
   {
     question: "How long does the process take?",
@@ -31,9 +31,9 @@ const faqItems: FAQItem[] = [
       "The initial analysis takes 24-48 hours. If you decide to switch, the transition typically takes 3-5 business days. You can continue processing payments normally throughout the entire process.",
   },
   {
-    question: "What makes Generosity Pays different?",
+    question: "What makes Generosity Pays different from other processors?",
     answer:
-      "Unlike traditional processors, a portion of every transaction supports charitable causes. You get lower fees AND make a positive impact\u2014it's payment processing with purpose.",
+      "We combine premium payment processing with a built-in charitable giving program. Every transaction supports real causes at no additional cost to you. Plus, you get transparent pricing, dedicated support, and ongoing statement reviews — the kind of service most processors don't offer.",
   },
 ];
 

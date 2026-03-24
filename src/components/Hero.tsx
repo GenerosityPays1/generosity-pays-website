@@ -117,9 +117,9 @@ export default function Hero() {
           className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight"
           variants={fadeUpVariants}
         >
-          Turn Your Payment Processing Into A{" "}
+          Turn Everyday Transactions Into{" "}
           <span className="bg-gradient-to-r from-primary-light via-primary to-primary-dark bg-clip-text text-transparent">
-            Force For Good
+            Meaningful Impact
           </span>
         </motion.h1>
 
@@ -128,7 +128,8 @@ export default function Hero() {
           className="mt-6 text-xl md:text-2xl text-gray-300 font-light max-w-2xl leading-relaxed"
           variants={fadeUpVariants}
         >
-          Reduce merchant fees while supporting charitable giving.
+          Premium payment processing that gives back to the causes you care
+          about — at no additional cost.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -141,16 +142,16 @@ export default function Hero() {
               href="/merchant-fee-analysis"
               className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-dark bg-primary rounded-full shadow-lg shadow-primary/30 hover:bg-primary-dark transition-colors duration-300 animate-pulse-glow"
             >
-              Free Fee Analysis
+              Get Your Free Analysis
             </Link>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
             <Link
-              href="#contact"
+              href="#how-it-works"
               className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white border-2 border-primary/40 rounded-full hover:bg-primary/10 hover:border-primary/70 transition-all duration-300 backdrop-blur-sm"
             >
-              Book A Consultation
+              See How It Works
             </Link>
           </motion.div>
         </motion.div>

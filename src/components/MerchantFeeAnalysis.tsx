@@ -7,10 +7,10 @@ import Link from "next/link";
 import { HiCheck, HiExclamation, HiUpload, HiDocument } from "react-icons/hi";
 
 const benefits = [
-  "Complete fee breakdown",
+  "Complete processing review",
   "Hidden fee identification",
-  "Savings opportunity report",
-  "Competitive rate comparison",
+  "Charitable impact overview",
+  "Personalized service assessment",
   "No obligation consultation",
 ];
 
@@ -174,11 +174,12 @@ export default function MerchantFeeAnalysis() {
           className="mb-12 text-center"
         >
           <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Free Merchant Fee Analysis
+            Free Processing Analysis
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-500">
-            Upload your processing statement and our experts will identify your
-            savings opportunities.
+            Upload your processing statement and our experts will review your
+            setup, identify opportunities, and show you how your business can
+            give back.
           </p>
         </motion.div>
 
@@ -411,7 +412,7 @@ export default function MerchantFeeAnalysis() {
                     Analyzing...
                   </span>
                 ) : (
-                  "Analyze My Fees"
+                  "Get My Free Analysis"
                 )}
               </motion.button>
 
@@ -512,7 +513,7 @@ export default function MerchantFeeAnalysis() {
                   Questions?
                 </p>
                 <p className="mb-4 text-sm text-gray-500">
-                  Our team is here to help you understand your processing fees.
+                  Our team is here to help you understand your processing and its impact.
                 </p>
                 <Link
                   href="/#contact"

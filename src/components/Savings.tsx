@@ -4,45 +4,45 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-interface FeeItem {
+interface ComparisonItem {
   label: string;
   value: string;
   highlight?: boolean;
 }
 
-interface FeeCard {
+interface ComparisonCard {
   title: string;
-  items: FeeItem[];
+  items: ComparisonItem[];
   total: string;
   variant: "traditional" | "generosity";
 }
 
-const feeCards: FeeCard[] = [
+const comparisonCards: ComparisonCard[] = [
   {
     title: "Traditional Processing",
     items: [
-      { label: "Per transaction", value: "2.9% + $0.30" },
-      { label: "Monthly fee", value: "$25" },
-      { label: "PCI compliance fee", value: "$99/yr" },
-      { label: "Hidden surcharges", value: "Varies" },
+      { label: "Transparency", value: "Hidden fees common" },
+      { label: "Charitable giving", value: "None" },
+      { label: "Dedicated support", value: "Limited" },
+      { label: "Statement reviews", value: "Not offered" },
     ],
-    total: "$4,500+/yr",
+    total: "Processing only",
     variant: "traditional",
   },
   {
     title: "Generosity Pays",
     items: [
-      { label: "Per transaction", value: "2.2% + $0.15" },
-      { label: "Monthly fee", value: "$0", highlight: true },
-      { label: "PCI compliance fee", value: "$0", highlight: true },
-      { label: "Hidden fees", value: "None", highlight: true },
+      { label: "Transparency", value: "Fully transparent", highlight: true },
+      { label: "Charitable giving", value: "Every transaction", highlight: true },
+      { label: "Dedicated support", value: "Always available", highlight: true },
+      { label: "Statement reviews", value: "Free & ongoing", highlight: true },
     ],
-    total: "$2,800/yr",
+    total: "Processing with purpose",
     variant: "generosity",
   },
 ];
 
-function ComparisonCard({ card }: { card: FeeCard }) {
+function ComparisonCardComponent({ card }: { card: ComparisonCard }) {
   const isTraditional = card.variant === "traditional";
 
   return (
@@ -57,10 +57,10 @@ function ComparisonCard({ card }: { card: FeeCard }) {
           : "bg-primary/10 border-2 border-primary/50 shadow-lg shadow-primary/10"
       }`}
     >
-      {/* Best value badge */}
+      {/* Recommended badge */}
       {!isTraditional && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-bold uppercase tracking-wider text-dark shadow-md">
-          Best Value
+          Recommended
         </div>
       )}
 
@@ -98,13 +98,13 @@ function ComparisonCard({ card }: { card: FeeCard }) {
         }`}
       />
 
-      {/* Total */}
+      {/* Bottom line */}
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-400">
-          Estimated Annual Cost
+          The Bottom Line
         </span>
         <span
-          className={`text-2xl font-bold ${
+          className={`text-lg font-bold ${
             isTraditional ? "text-red-400" : "text-primary-light"
           }`}
         >
@@ -155,14 +155,14 @@ export default function Savings() {
           className="mb-16 text-center"
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Real Savings For Real Businesses
+            The Generosity Pays Difference
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-primary-light/70">
-            See how much your business could save with transparent, fair pricing.
+            Payment processing built on transparency, quality, and purpose.
           </p>
         </motion.div>
 
-        {/* Fee comparison cards */}
+        {/* Comparison cards */}
         <div className="mx-auto max-w-4xl">
           <motion.h3
             initial={{ opacity: 0, y: 20 }}
@@ -171,12 +171,12 @@ export default function Savings() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="mb-10 text-center text-2xl font-semibold text-white"
           >
-            See The Difference
+            What Sets Us Apart
           </motion.h3>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
-            {feeCards.map((card) => (
-              <ComparisonCard key={card.variant} card={card} />
+            {comparisonCards.map((card) => (
+              <ComparisonCardComponent key={card.variant} card={card} />
             ))}
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function Savings() {
               href="#contact"
               className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-4 text-lg font-semibold text-dark shadow-lg shadow-primary/30 transition-colors duration-300 hover:bg-primary-dark"
             >
-              Start Saving Today
+              Discover Your Impact
             </Link>
           </motion.div>
         </motion.div>
