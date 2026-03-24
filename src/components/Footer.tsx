@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FiLinkedin, FiTwitter, FiFacebook } from "react-icons/fi";
 
 const quickLinks = [
@@ -29,7 +30,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Company Info */}
           <div>
-            <h3 className="text-2xl font-bold text-white">Generosity Pays</h3>
+            <Image
+              src="/logo.jpg"
+              alt="Generosity Pays — Merchant Services"
+              width={160}
+              height={160}
+              className="h-16 w-auto rounded-lg"
+            />
             <p className="mt-4 text-sm leading-relaxed text-gray-400">
               Premium payment processing with purpose. Every transaction
               supports charitable causes that make a difference — at no

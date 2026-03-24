@@ -58,12 +58,15 @@ export default function Navbar() {
       >
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-1" onClick={closeMobile}>
-            <Image src="/logo-mark.svg" alt="Generosity Pays" width={40} height={36} className="h-9 w-auto" />
-            <span className="text-xl font-semibold tracking-tight font-serif">
-              <span className="text-dark">Generosity</span>
-              <span className="text-dark italic"> Pays</span>
-            </span>
+          <Link href="/" className="flex items-center" onClick={closeMobile}>
+            <Image
+              src="/logo.jpg"
+              alt="Generosity Pays — Merchant Services"
+              width={200}
+              height={200}
+              priority
+              className="h-[52px] w-auto rounded-lg object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -139,11 +142,14 @@ export default function Navbar() {
             >
               {/* Drawer Header */}
               <div className="flex h-[70px] items-center justify-between border-b border-gray-100 px-5">
-                <span className="flex items-center gap-1">
-                  <Image src="/logo-mark.svg" alt="" width={32} height={28} className="h-7 w-auto" />
-                  <span className="text-lg font-semibold tracking-tight font-serif text-dark">
-                    Generosity <span className="italic">Pays</span>
-                  </span>
+                <span className="flex items-center">
+                  <Image
+                    src="/logo.jpg"
+                    alt="Generosity Pays"
+                    width={160}
+                    height={160}
+                    className="h-[44px] w-auto rounded-lg object-contain"
+                  />
                 </span>
                 <button
                   type="button"

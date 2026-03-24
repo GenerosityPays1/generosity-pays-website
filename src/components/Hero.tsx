@@ -101,14 +101,15 @@ export default function Hero() {
         initial="hidden"
         animate="visible"
       >
-        {/* Logo mark */}
+        {/* Logo */}
         <motion.div variants={fadeUpVariants} className="mb-6">
           <Image
-            src="/logo-mark.svg"
+            src="/logo.jpg"
             alt=""
-            width={80}
-            height={70}
-            className="h-20 w-auto drop-shadow-lg"
+            width={200}
+            height={200}
+            priority
+            className="h-24 w-auto rounded-2xl drop-shadow-lg"
           />
         </motion.div>
 
