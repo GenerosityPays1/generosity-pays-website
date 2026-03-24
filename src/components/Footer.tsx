@@ -31,11 +31,12 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <Image
-              src="/logo.jpg"
+              src="/TransparentLogo.png"
               alt="Generosity Pays — Merchant Services"
               width={160}
               height={160}
-              className="h-16 w-auto rounded-lg"
+              className="h-16 w-auto rounded-lg bg-white/10 p-1"
+              style={{ filter: "brightness(0) invert(1)" }}
             />
             <p className="mt-4 text-sm leading-relaxed text-gray-400">
               Premium payment processing with purpose. Every transaction

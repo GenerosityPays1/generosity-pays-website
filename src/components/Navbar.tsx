@@ -60,12 +60,12 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center" onClick={closeMobile}>
             <Image
-              src="/logo.jpg"
+              src="/TransparentLogo.png"
               alt="Generosity Pays — Merchant Services"
               width={200}
               height={200}
               priority
-              className="h-[52px] w-auto rounded-lg object-contain"
+              className="h-[52px] w-auto object-contain"
             />
           </Link>
 
@@ -144,11 +144,11 @@ export default function Navbar() {
               <div className="flex h-[70px] items-center justify-between border-b border-gray-100 px-5">
                 <span className="flex items-center">
                   <Image
-                    src="/logo.jpg"
+                    src="/TransparentLogo.png"
                     alt="Generosity Pays"
                     width={160}
                     height={160}
-                    className="h-[44px] w-auto rounded-lg object-contain"
+                    className="h-[44px] w-auto object-contain"
                   />
                 </span>
                 <button

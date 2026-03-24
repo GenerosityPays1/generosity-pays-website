@@ -104,12 +104,13 @@ export default function Hero() {
         {/* Logo */}
         <motion.div variants={fadeUpVariants} className="mb-6">
           <Image
-            src="/logo.jpg"
+            src="/TransparentLogo.png"
             alt=""
             width={200}
             height={200}
             priority
-            className="h-24 w-auto rounded-2xl drop-shadow-lg"
+            className="h-24 w-auto drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+            style={{ filter: "brightness(0) invert(1)" }}
           />
         </motion.div>
 
