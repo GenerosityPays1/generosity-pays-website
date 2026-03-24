@@ -79,7 +79,10 @@ const levelColors: Record<string, string> = {
 };
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  // SQLite stores UTC timestamps — append 'Z' if missing so the browser
+  // correctly converts to the user's local timezone
+  const utcDate = dateStr.endsWith("Z") ? dateStr : dateStr + "Z";
+  return new Date(utcDate).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     hour: "numeric",
