@@ -54,7 +54,7 @@ export default function Navbar() {
         className={`fixed top-0 left-0 right-0 z-50 h-[70px] transition-all duration-300 ${
           scrolled
             ? "bg-white/95 shadow-md backdrop-blur-md"
-            : "bg-transparent"
+            : "bg-black/30 backdrop-blur-sm"
         }`}
       >
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -82,7 +82,7 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
-                    scrolled ? "text-gray-700 hover:bg-primary/5" : "text-white/90 hover:bg-white/10"
+                    scrolled ? "text-gray-700 hover:bg-primary/5" : "text-white hover:bg-white/15"
                   }`}
                 >
                   {link.label}
@@ -92,7 +92,7 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
-                    scrolled ? "text-gray-700 hover:bg-primary/5" : "text-white/90 hover:bg-white/10"
+                    scrolled ? "text-gray-700 hover:bg-primary/5" : "text-white hover:bg-white/15"
                   }`}
                 >
                   {link.label}
