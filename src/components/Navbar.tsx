@@ -11,6 +11,7 @@ const navLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Solutions", href: "#features" },
   { label: "Free Analysis", href: "/merchant-fee-analysis" },
+  { label: "Relay For Life", href: "/relay-for-life" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];

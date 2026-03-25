@@ -13,6 +13,9 @@
   --color-muted: #9C9083;
   --color-dark: #1A1714;
   --color-dark-light: #2D2A26;
+  --color-acs-purple: #7B2D8E;
+  --color-acs-purple-dark: #5E1F6E;
+  --color-acs-purple-light: #9B4DB0;
   --color-gray-50: #FAF8F6;
   --color-gray-100: #F5F0EB;
   --color-gray-200: #E8E0D8;
@@ -76,4 +79,13 @@ body {
 
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-purple {
+  0%, 100% { box-shadow: 0 0 20px rgba(123, 45, 142, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(123, 45, 142, 0.6); }
+}
+
+.animate-pulse-glow-purple {
+  animation: pulse-glow-purple 3s ease-in-out infinite;
 }
