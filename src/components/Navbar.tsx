@@ -61,12 +61,13 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" onClick={closeMobile}>
             <Image
-              src="/TransparentLogo.png"
+              src="/GenPayLogo.png"
               alt="Generosity Pays"
               width={48}
               height={48}
               priority
-              className="h-10 w-10 object-contain"
+              className="h-10 w-10 object-contain transition-all duration-300"
+              style={scrolled ? undefined : { filter: "brightness(0) invert(1)" }}
             />
             <span className="text-xl font-semibold tracking-tight font-serif">
               <span className={scrolled ? "text-dark" : "text-white"}>Generosity</span>
@@ -155,7 +156,7 @@ export default function Navbar() {
               <div className="flex h-[70px] items-center justify-between border-b border-gray-100 px-5">
                 <span className="flex items-center gap-2">
                   <Image
-                    src="/TransparentLogo.png"
+                    src="/GenPayLogo.png"
                     alt="Generosity Pays"
                     width={36}
                     height={36}
