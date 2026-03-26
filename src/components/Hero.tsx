@@ -106,10 +106,10 @@ export default function Hero() {
           <Image
             src="/GenPayLogo.png"
             alt=""
-            width={96}
-            height={96}
+            width={120}
+            height={120}
             priority
-            className="h-20 w-20 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+            className="h-28 w-28 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
             style={{ filter: "brightness(0) invert(1)" }}
           />
         </motion.div>

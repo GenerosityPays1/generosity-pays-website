@@ -34,9 +34,9 @@ export default function Footer() {
               <Image
                 src="/GenPayLogo.png"
                 alt="Generosity Pays"
-                width={40}
-                height={40}
-                className="h-9 w-9 object-contain"
+                width={52}
+                height={52}
+                className="h-13 w-13 object-contain"
                 style={{ filter: "brightness(0) invert(1)" }}
               />
               <h3 className="text-2xl font-bold text-white">Generosity Pays</h3>

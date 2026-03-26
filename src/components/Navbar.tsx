@@ -63,10 +63,10 @@ export default function Navbar() {
             <Image
               src="/GenPayLogo.png"
               alt="Generosity Pays"
-              width={48}
-              height={48}
+              width={56}
+              height={56}
               priority
-              className="h-10 w-10 object-contain transition-all duration-300"
+              className="h-14 w-14 object-contain transition-all duration-300"
               style={scrolled ? undefined : { filter: "brightness(0) invert(1)" }}
             />
             <span className="text-xl font-semibold tracking-tight font-serif">
@@ -158,9 +158,9 @@ export default function Navbar() {
                   <Image
                     src="/GenPayLogo.png"
                     alt="Generosity Pays"
-                    width={36}
-                    height={36}
-                    className="h-8 w-8 object-contain"
+                    width={44}
+                    height={44}
+                    className="h-11 w-11 object-contain"
                   />
                   <span className="text-lg font-semibold tracking-tight font-serif text-dark">
                     Generosity <span className="italic">Pays</span>
