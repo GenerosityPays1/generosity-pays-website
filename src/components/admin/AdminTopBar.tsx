@@ -15,6 +15,7 @@ const pageTitleMap: Record<string, string> = {
   "/admin/analytics": "Analytics",
   "/admin/documents": "Documents",
   "/admin/contacts": "Contacts",
+  "/admin/volunteers": "Volunteers",
   "/admin/settings": "Settings",
 };
 

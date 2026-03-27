@@ -13,6 +13,7 @@ import {
   HiOutlineChartBar,
   HiOutlineFolder,
   HiOutlineEnvelope,
+  HiOutlineHandRaised,
   HiOutlineServerStack,
   HiOutlineCog6Tooth,
   HiOutlineArrowRightOnRectangle,
@@ -70,6 +71,11 @@ const navItems: NavItem[] = [
     label: "Contacts",
     href: "/admin/contacts",
     icon: <HiOutlineEnvelope className="w-5 h-5" />,
+  },
+  {
+    label: "Volunteers",
+    href: "/admin/volunteers",
+    icon: <HiOutlineHandRaised className="w-5 h-5" />,
   },
   {
     label: "Logs",
