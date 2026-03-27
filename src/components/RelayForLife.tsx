@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,7 @@ import {
   HiLocationMarker,
   HiGift,
   HiGlobeAlt,
+  HiClipboardList,
 } from "react-icons/hi";
 import { IconType } from "react-icons";
 
@@ -144,6 +145,224 @@ function StatCounter({ stat, delay }: { stat: Stat; delay: number }) {
       </p>
       <p className="mt-1 text-sm font-medium text-gray-500">{stat.label}</p>
     </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Volunteer form sub-component                                       */
+/* ------------------------------------------------------------------ */
+
+const availabilityOptions = [
+  { value: "", label: "Select your availability" },
+  { value: "Full Day", label: "Full Day" },
+  { value: "Morning Shift", label: "Morning Shift" },
+  { value: "Afternoon Shift", label: "Afternoon Shift" },
+  { value: "Evening Shift", label: "Evening Shift" },
+  { value: "Flexible", label: "Flexible" },
+];
+
+function VolunteerForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    availability: "",
+    experience: "",
+    notes: "",
+  });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/volunteers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          page_source: window.location.pathname,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      setStatus("success");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to submit. Please try again.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-8 shadow-lg text-center min-h-[400px]">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+          <HiHeart className="h-8 w-8 text-green-600" />
+        </div>
+        <h3 className="mb-2 text-2xl font-bold text-gray-900">Thank You!</h3>
+        <p className="max-w-sm text-gray-600">
+          We&apos;ll be in touch with more details about the event. We appreciate
+          your willingness to volunteer!
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl bg-white p-8 shadow-lg"
+    >
+      <h3 className="mb-6 text-xl font-bold text-gray-900">
+        Sign Up To Volunteer
+      </h3>
+
+      <div className="space-y-5">
+        {/* Name */}
+        <div>
+          <label htmlFor="vol-name" className="mb-1 block text-sm font-medium text-gray-700">
+            Full Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="vol-name"
+            name="name"
+            type="text"
+            required
+            maxLength={200}
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            placeholder="Your full name"
+          />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label htmlFor="vol-email" className="mb-1 block text-sm font-medium text-gray-700">
+            Email <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="vol-email"
+            name="email"
+            type="email"
+            required
+            maxLength={254}
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        {/* Phone */}
+        <div>
+          <label htmlFor="vol-phone" className="mb-1 block text-sm font-medium text-gray-700">
+            Phone Number
+          </label>
+          <input
+            id="vol-phone"
+            name="phone"
+            type="tel"
+            maxLength={30}
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            placeholder="(555) 123-4567"
+          />
+        </div>
+
+        {/* Availability */}
+        <div>
+          <label htmlFor="vol-availability" className="mb-1 block text-sm font-medium text-gray-700">
+            Availability
+          </label>
+          <select
+            id="vol-availability"
+            name="availability"
+            value={formData.availability}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            {availabilityOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Experience / Skills */}
+        <div>
+          <label htmlFor="vol-experience" className="mb-1 block text-sm font-medium text-gray-700">
+            Experience / Skills
+          </label>
+          <textarea
+            id="vol-experience"
+            name="experience"
+            rows={3}
+            maxLength={1000}
+            value={formData.experience}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+            placeholder="Tell us about any relevant experience or skills..."
+          />
+        </div>
+
+        {/* Additional Notes */}
+        <div>
+          <label htmlFor="vol-notes" className="mb-1 block text-sm font-medium text-gray-700">
+            Additional Notes
+          </label>
+          <textarea
+            id="vol-notes"
+            name="notes"
+            rows={3}
+            maxLength={2000}
+            value={formData.notes}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+            placeholder="Anything else you'd like us to know..."
+          />
+        </div>
+      </div>
+
+      {/* Error message */}
+      {status === "error" && (
+        <p className="mt-4 text-sm text-red-600">{errorMsg}</p>
+      )}
+
+      {/* Submit button */}
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className="mt-6 w-full rounded-full bg-primary px-8 py-3 text-base font-semibold text-dark shadow-sm transition-all hover:bg-primary-dark hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {status === "loading" ? (
+          <span className="inline-flex items-center gap-2">
+            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Submitting...
+          </span>
+        ) : (
+          "Sign Up To Volunteer"
+        )}
+      </button>
+    </form>
   );
 }
 
@@ -523,7 +742,67 @@ export default function RelayForLife() {
       </section>
 
       {/* ============================================================ */}
-      {/*  SECTION 4 — Generosity Pays Partnership                     */}
+      {/*  SECTION 4 — Volunteer Sign-Up                               */}
+      {/* ============================================================ */}
+      <section id="volunteer" className="bg-warm py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-5 lg:gap-16">
+            {/* Left — Info (2 cols) */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="lg:col-span-2"
+            >
+              <span className="mb-3 inline-block text-sm font-semibold uppercase tracking-wider text-primary-dark">
+                Get Involved
+              </span>
+              <h2 className="mb-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Volunteer With Us
+              </h2>
+              <p className="mb-8 text-lg leading-relaxed text-gray-600">
+                Join the Generosity Pays team at Relay For Life. We&apos;re
+                looking for enthusiastic volunteers to help run our booth and
+                share our mission with the community.
+              </p>
+
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
+                  What You&apos;ll Do
+                </h3>
+                {[
+                  "Greet visitors and share information",
+                  "Help set up and manage the booth",
+                  "Connect with local business owners",
+                  "Represent Generosity Pays at the event",
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-3">
+                    <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <HiClipboardList className="h-3 w-3 text-primary" />
+                    </div>
+                    <span className="text-gray-600">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Right — Form (3 cols) */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
+              className="lg:col-span-3"
+            >
+              <VolunteerForm />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/*  SECTION 5 — Generosity Pays Partnership                     */}
       {/* ============================================================ */}
       <section id="partnership" className="bg-warm py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -606,7 +885,7 @@ export default function RelayForLife() {
       </section>
 
       {/* ============================================================ */}
-      {/*  SECTION 5 — Call To Action                                  */}
+      {/*  SECTION 6 — Call To Action                                  */}
       {/* ============================================================ */}
       <section
         className="relative overflow-hidden py-24"

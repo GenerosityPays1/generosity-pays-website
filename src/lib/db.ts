@@ -151,6 +151,19 @@ function getDb(): Database.Database {
       success INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS volunteers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      availability TEXT,
+      experience TEXT,
+      notes TEXT,
+      ip_address TEXT,
+      page_source TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   // Additive ALTER statements for existing tables

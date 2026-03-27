@@ -87,6 +87,25 @@ export function notifyNewContact(name: string, email: string, message: string): 
   ).catch(() => {});
 }
 
+/**
+ * Notify admin of a new volunteer sign-up.
+ * Fire-and-forget — never blocks the main request.
+ */
+export function notifyNewVolunteer(name: string, email: string): void {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return;
+
+  sendEmail(
+    adminEmail,
+    `New Relay For Life Volunteer: ${name}`,
+    `
+      <h2>New Volunteer Sign-Up</h2>
+      <p><strong>${escapeHtml(name)}</strong> (${escapeHtml(email)}) has signed up to volunteer at the Relay For Life booth.</p>
+      <p>Log in to the <a href="${process.env.BASE_URL || ''}/admin">admin dashboard</a> to view details.</p>
+    `
+  ).catch(() => {});
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
