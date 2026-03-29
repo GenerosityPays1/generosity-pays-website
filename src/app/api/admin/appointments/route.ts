@@ -24,28 +24,21 @@ export async function GET(request: NextRequest) {
       orderClause = 'ORDER BY appointment_date DESC';
     }
 
-    const totalRow = db.prepare(
+    const countResult = await db.execute(
       `SELECT COUNT(*) as total FROM appointments ${whereClause}`
-    ).get() as { total: number };
-    const total = totalRow.total;
+    );
+    const total = Number(countResult.rows[0]?.total ?? 0);
     const totalPages = Math.ceil(total / limit);
 
-    const appointments = db.prepare(
-      `SELECT * FROM appointments ${whereClause} ${orderClause} LIMIT ? OFFSET ?`
-    ).all(limit, offset);
-
-    return NextResponse.json({
-      appointments,
-      total,
-      page,
-      totalPages,
+    const appointmentsResult = await db.execute({
+      sql: `SELECT * FROM appointments ${whereClause} ${orderClause} LIMIT ? OFFSET ?`,
+      args: [limit, offset],
     });
+
+    return NextResponse.json({ appointments: appointmentsResult.rows, total, page, totalPages });
   } catch (error) {
-    console.error('Error fetching appointments:');
-    return NextResponse.json(
-      { error: 'Failed to fetch appointments' },
-      { status: 500 }
-    );
+    console.error('Error fetching appointments:', error);
+    return NextResponse.json({ error: 'Failed to fetch appointments' }, { status: 500 });
   }
 }
 
@@ -56,14 +49,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      title,
-      description,
-      merchant_id,
-      lead_id,
-      appointment_date,
-      duration_minutes,
-      location,
-      notes,
+      title, description, merchant_id, lead_id,
+      appointment_date, duration_minutes, location, notes,
     } = body;
 
     if (!title || !appointment_date) {
@@ -73,29 +60,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = db.prepare(`
-      INSERT INTO appointments (title, description, merchant_id, lead_id, appointment_date, duration_minutes, location, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      title,
-      description || null,
-      merchant_id || null,
-      lead_id || null,
-      appointment_date,
-      duration_minutes || 30,
-      location || null,
-      notes || null
-    );
+    const result = await db.execute({
+      sql: `INSERT INTO appointments (title, description, merchant_id, lead_id, appointment_date, duration_minutes, location, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        title, description ?? null, merchant_id ?? null, lead_id ?? null,
+        appointment_date, duration_minutes ?? 30, location ?? null, notes ?? null,
+      ],
+    });
 
     return NextResponse.json(
-      { success: true, id: result.lastInsertRowid },
+      { success: true, id: Number(result.lastInsertRowid) },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating appointment:');
-    return NextResponse.json(
-      { error: 'Failed to create appointment' },
-      { status: 500 }
-    );
+    console.error('Error creating appointment:', error);
+    return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 });
   }
 }

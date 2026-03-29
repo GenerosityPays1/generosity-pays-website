@@ -35,38 +35,21 @@ export async function GET(request: NextRequest) {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const countRow = db
-      .prepare(`SELECT COUNT(*) as total FROM leads ${whereClause}`)
-      .get(...params.length ? [params] : []) as { total: number } | undefined;
-
-    // Need to handle the params spread for better-sqlite3
-    const total = (() => {
-      const stmt = db.prepare(`SELECT COUNT(*) as total FROM leads ${whereClause}`);
-      const row = (params.length > 0 ? stmt.get(...params) : stmt.get()) as { total: number };
-      return row.total;
-    })();
-
+    const countResult = await db.execute({
+      sql: `SELECT COUNT(*) as total FROM leads ${whereClause}`,
+      args: params,
+    });
+    const total = Number(countResult.rows[0]?.total ?? 0);
     const totalPages = Math.ceil(total / limit);
 
-    const leads = (() => {
-      const stmt = db.prepare(
-        `SELECT * FROM leads ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`
-      );
-      const allParams = [...params, limit, offset];
-      return stmt.all(...allParams);
-    })();
-
-    return NextResponse.json({
-      leads,
-      total,
-      page,
-      totalPages,
+    const leadsResult = await db.execute({
+      sql: `SELECT * FROM leads ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      args: [...params, limit, offset],
     });
+
+    return NextResponse.json({ leads: leadsResult.rows, total, page, totalPages });
   } catch (error) {
-    console.error('Error fetching leads:');
-    return NextResponse.json(
-      { error: 'Failed to fetch leads' },
-      { status: 500 }
-    );
+    console.error('Error fetching leads:', error);
+    return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
   }
 }

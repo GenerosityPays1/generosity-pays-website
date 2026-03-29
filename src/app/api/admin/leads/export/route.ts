@@ -18,13 +18,7 @@ interface Lead {
 function escapeCsvField(field: string | null | number): string {
   if (field === null || field === undefined) return '';
   let str = String(field);
-
-  // Prevent CSV formula injection — prefix dangerous characters with a single quote
-  // This prevents Excel/Sheets from interpreting =, +, -, @, \t, \r as formulas
-  if (/^[=+\-@\t\r]/.test(str)) {
-    str = `'${str}`;
-  }
-
+  if (/^[=+\-@\t\r]/.test(str)) str = `'${str}`;
   if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes("'")) {
     return `"${str.replace(/"/g, '""')}"`;
   }
@@ -36,36 +30,21 @@ export async function GET(request: NextRequest) {
     const token = getTokenFromHeader(request.headers.get('authorization'));
 
     if (!token) {
-      return NextResponse.json(
-        { error: 'Authorization token required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authorization token required' }, { status: 401 });
     }
 
     try {
       verifyToken(token);
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
-    const leads = db
-      .prepare('SELECT * FROM leads ORDER BY created_at DESC')
-      .all() as Lead[];
+    const result = await db.execute('SELECT * FROM leads ORDER BY created_at DESC');
+    const leads = result.rows as unknown as Lead[];
 
     const headers = [
-      'ID',
-      'Name',
-      'Business Name',
-      'Email',
-      'Phone',
-      'Monthly Volume',
-      'Lead Type',
-      'Statement Filename',
-      'Contacted',
-      'Created At',
+      'ID', 'Name', 'Business Name', 'Email', 'Phone',
+      'Monthly Volume', 'Lead Type', 'Statement Filename', 'Contacted', 'Created At',
     ];
 
     const csvRows = [headers.join(',')];
@@ -86,9 +65,7 @@ export async function GET(request: NextRequest) {
       csvRows.push(row.join(','));
     }
 
-    const csv = csvRows.join('\n');
-
-    return new NextResponse(csv, {
+    return new NextResponse(csvRows.join('\n'), {
       status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -96,10 +73,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error exporting leads');
-    return NextResponse.json(
-      { error: 'Failed to export leads' },
-      { status: 500 }
-    );
+    console.error('Error exporting leads:', error);
+    return NextResponse.json({ error: 'Failed to export leads' }, { status: 500 });
   }
 }

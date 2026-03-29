@@ -2,43 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { requireAuth, parsePagination } from '@/lib/api-helpers';
 
-interface LogRow {
-  id: number;
-  level: string;
-  category: string;
-  message: string;
-  details: string | null;
-  ip_address: string | null;
-  user_agent: string | null;
-  request_path: string | null;
-  created_at: string;
-}
-
-interface LoginAttemptRow {
-  id: number;
-  ip_address: string;
-  username: string;
-  success: number;
-  created_at: string;
-}
-
-interface ActivityRow {
-  id: number;
-  action: string;
-  entity_type: string;
-  entity_id: number | null;
-  details: string | null;
-  admin_user_id: number | null;
-  created_at: string;
-}
-
 export async function GET(request: NextRequest) {
   const auth = requireAuth(request);
   if (auth instanceof NextResponse) return auth;
 
   const url = new URL(request.url);
   const { page, limit, offset } = parsePagination(url);
-  const logType = url.searchParams.get('log_type') || 'server'; // server | login | activity
+  const logType = url.searchParams.get('log_type') || 'server';
   const level = url.searchParams.get('level');
   const category = url.searchParams.get('category');
   const dateFrom = url.searchParams.get('date_from');
@@ -54,14 +24,16 @@ export async function GET(request: NextRequest) {
 
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-      const total = (db.prepare(`SELECT COUNT(*) as count FROM login_attempts ${where}`).get(...params) as { count: number }).count;
-      const rows = db.prepare(`SELECT * FROM login_attempts ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(...params, limit, offset) as LoginAttemptRow[];
+      const [countResult, rowsResult] = await Promise.all([
+        db.execute({ sql: `SELECT COUNT(*) as count FROM login_attempts ${where}`, args: params }),
+        db.execute({ sql: `SELECT * FROM login_attempts ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`, args: [...params, limit, offset] }),
+      ]);
 
       return NextResponse.json({
-        logs: rows,
-        total,
+        logs: rowsResult.rows,
+        total: Number(countResult.rows[0]?.count ?? 0),
         page,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(Number(countResult.rows[0]?.count ?? 0) / limit),
       });
     }
 
@@ -74,14 +46,16 @@ export async function GET(request: NextRequest) {
 
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-      const total = (db.prepare(`SELECT COUNT(*) as count FROM activity_log ${where}`).get(...params) as { count: number }).count;
-      const rows = db.prepare(`SELECT * FROM activity_log ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(...params, limit, offset) as ActivityRow[];
+      const [countResult, rowsResult] = await Promise.all([
+        db.execute({ sql: `SELECT COUNT(*) as count FROM activity_log ${where}`, args: params }),
+        db.execute({ sql: `SELECT * FROM activity_log ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`, args: [...params, limit, offset] }),
+      ]);
 
       return NextResponse.json({
-        logs: rows,
-        total,
+        logs: rowsResult.rows,
+        total: Number(countResult.rows[0]?.count ?? 0),
         page,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(Number(countResult.rows[0]?.count ?? 0) / limit),
       });
     }
 
@@ -96,19 +70,18 @@ export async function GET(request: NextRequest) {
 
     const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const total = (db.prepare(`SELECT COUNT(*) as count FROM server_logs ${where}`).get(...params) as { count: number }).count;
-    const rows = db.prepare(`SELECT * FROM server_logs ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(...params, limit, offset) as LogRow[];
+    const [countResult, rowsResult] = await Promise.all([
+      db.execute({ sql: `SELECT COUNT(*) as count FROM server_logs ${where}`, args: params }),
+      db.execute({ sql: `SELECT * FROM server_logs ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`, args: [...params, limit, offset] }),
+    ]);
 
     return NextResponse.json({
-      logs: rows,
-      total,
+      logs: rowsResult.rows,
+      total: Number(countResult.rows[0]?.count ?? 0),
       page,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(Number(countResult.rows[0]?.count ?? 0) / limit),
     });
   } catch {
-    return NextResponse.json(
-      { error: 'Failed to fetch logs' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch logs' }, { status: 500 });
   }
 }

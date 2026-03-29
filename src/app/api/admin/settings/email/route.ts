@@ -11,28 +11,22 @@ export async function PATCH(request: NextRequest) {
     const { email } = body;
 
     if (!email) {
-      return NextResponse.json(
-        { error: 'email is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'email is required' }, { status: 400 });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email address' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
-    db.prepare('UPDATE admin_users SET email = ? WHERE id = ?').run(email, auth.userId);
+    await db.execute({
+      sql: 'UPDATE admin_users SET email = ? WHERE id = ?',
+      args: [email, auth.userId],
+    });
 
     return NextResponse.json({ success: true, message: 'Email updated successfully' });
   } catch (error) {
-    console.error('Error updating email:');
-    return NextResponse.json(
-      { error: 'Failed to update email' },
-      { status: 500 }
-    );
+    console.error('Error updating email:', error);
+    return NextResponse.json({ error: 'Failed to update email' }, { status: 500 });
   }
 }

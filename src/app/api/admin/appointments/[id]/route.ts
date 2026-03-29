@@ -18,19 +18,19 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid appointment ID' }, { status: 400 });
     }
 
-    const appointment = db.prepare('SELECT * FROM appointments WHERE id = ?').get(appointmentId);
+    const result = await db.execute({
+      sql: 'SELECT * FROM appointments WHERE id = ?',
+      args: [appointmentId],
+    });
 
-    if (!appointment) {
+    if (!result.rows[0]) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ appointment });
+    return NextResponse.json({ appointment: result.rows[0] });
   } catch (error) {
-    console.error('Error fetching appointment:');
-    return NextResponse.json(
-      { error: 'Failed to fetch appointment' },
-      { status: 500 }
-    );
+    console.error('Error fetching appointment:', error);
+    return NextResponse.json({ error: 'Failed to fetch appointment' }, { status: 500 });
   }
 }
 
@@ -49,9 +49,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid appointment ID' }, { status: 400 });
     }
 
-    const existing = db.prepare('SELECT * FROM appointments WHERE id = ?').get(appointmentId);
+    const existingResult = await db.execute({
+      sql: 'SELECT * FROM appointments WHERE id = ?',
+      args: [appointmentId],
+    });
 
-    if (!existing) {
+    if (!existingResult.rows[0]) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
@@ -78,21 +81,22 @@ export async function PATCH(
     updates.push("updated_at = datetime('now')");
     values.push(appointmentId);
 
-    db.prepare(
-      `UPDATE appointments SET ${updates.join(', ')} WHERE id = ?`
-    ).run(...values);
+    await db.execute({
+      sql: `UPDATE appointments SET ${updates.join(', ')} WHERE id = ?`,
+      args: values,
+    });
 
     logActivity('update', 'appointment', appointmentId, `Updated appointment fields: ${Object.keys(body).join(', ')}`, auth.userId);
 
-    const updatedAppointment = db.prepare('SELECT * FROM appointments WHERE id = ?').get(appointmentId);
+    const updatedResult = await db.execute({
+      sql: 'SELECT * FROM appointments WHERE id = ?',
+      args: [appointmentId],
+    });
 
-    return NextResponse.json({ success: true, appointment: updatedAppointment });
+    return NextResponse.json({ success: true, appointment: updatedResult.rows[0] });
   } catch (error) {
-    console.error('Error updating appointment:');
-    return NextResponse.json(
-      { error: 'Failed to update appointment' },
-      { status: 500 }
-    );
+    console.error('Error updating appointment:', error);
+    return NextResponse.json({ error: 'Failed to update appointment' }, { status: 500 });
   }
 }
 
@@ -111,22 +115,23 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid appointment ID' }, { status: 400 });
     }
 
-    const appointment = db.prepare('SELECT * FROM appointments WHERE id = ?').get(appointmentId) as Record<string, unknown> | undefined;
+    const appointmentResult = await db.execute({
+      sql: 'SELECT * FROM appointments WHERE id = ?',
+      args: [appointmentId],
+    });
+    const appointment = appointmentResult.rows[0] as Record<string, unknown> | undefined;
 
     if (!appointment) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
-    db.prepare('DELETE FROM appointments WHERE id = ?').run(appointmentId);
+    await db.execute({ sql: 'DELETE FROM appointments WHERE id = ?', args: [appointmentId] });
 
     logActivity('delete', 'appointment', appointmentId, `Deleted appointment: ${appointment.title}`, auth.userId);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting appointment:');
-    return NextResponse.json(
-      { error: 'Failed to delete appointment' },
-      { status: 500 }
-    );
+    console.error('Error deleting appointment:', error);
+    return NextResponse.json({ error: 'Failed to delete appointment' }, { status: 500 });
   }
 }

@@ -13,17 +13,15 @@ export async function GET(request: NextRequest) {
 
     const whereClause = unreadOnly ? 'WHERE read = 0' : '';
 
-    const notifications = db.prepare(
-      `SELECT * FROM notifications ${whereClause} ORDER BY created_at DESC LIMIT ?`
-    ).all(limit);
+    const result = await db.execute({
+      sql: `SELECT * FROM notifications ${whereClause} ORDER BY created_at DESC LIMIT ?`,
+      args: [limit],
+    });
 
-    return NextResponse.json({ notifications });
+    return NextResponse.json({ notifications: result.rows });
   } catch (error) {
-    console.error('Error fetching notifications:');
-    return NextResponse.json(
-      { error: 'Failed to fetch notifications' },
-      { status: 500 }
-    );
+    console.error('Error fetching notifications:', error);
+    return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
   }
 }
 
@@ -36,13 +34,9 @@ export async function PATCH(request: NextRequest) {
     const { ids } = body as { ids: number[] };
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return NextResponse.json(
-        { error: 'ids array is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ids array is required' }, { status: 400 });
     }
 
-    // Validate all IDs are positive integers and limit batch size
     if (ids.length > 200 || !ids.every((id) => Number.isInteger(id) && id > 0)) {
       return NextResponse.json(
         { error: 'Invalid ids — must be an array of positive integers (max 200)' },
@@ -50,17 +44,17 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const stmt = db.prepare('UPDATE notifications SET read = 1 WHERE id = ?');
-    for (const id of ids) {
-      stmt.run(id);
-    }
+    await db.batch(
+      ids.map((id) => ({
+        sql: 'UPDATE notifications SET read = 1 WHERE id = ?',
+        args: [id] as [number],
+      })),
+      'write'
+    );
 
     return NextResponse.json({ success: true, updated: ids.length });
   } catch (error) {
-    console.error('Error marking notifications as read:');
-    return NextResponse.json(
-      { error: 'Failed to update notifications' },
-      { status: 500 }
-    );
+    console.error('Error marking notifications as read:', error);
+    return NextResponse.json({ error: 'Failed to update notifications' }, { status: 500 });
   }
 }

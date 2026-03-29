@@ -22,10 +22,8 @@ export async function POST(request: NextRequest) {
     const page_source = formData.get('page_source') as string | null;
     const file = formData.get('statement') as File | null;
 
-    // Capture client IP
     const ip_address = getClientIp(request);
 
-    // Validate required fields
     if (!name || !email || !lead_type) {
       return NextResponse.json(
         { error: 'Name, email, and lead_type are required' },
@@ -33,7 +31,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Input length limits
     if (name.length > 200 || (business_name && business_name.length > 200)) {
       return NextResponse.json(
         { error: 'Name fields must be under 200 characters' },
@@ -42,13 +39,9 @@ export async function POST(request: NextRequest) {
     }
 
     if ((phone && phone.length > 30) || (monthly_volume && monthly_volume.length > 50)) {
-      return NextResponse.json(
-        { error: 'Invalid input length' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid input length' }, { status: 400 });
     }
 
-    // Validate email format
     if (!isValidEmail(email)) {
       return NextResponse.json(
         { error: 'Please provide a valid email address' },
@@ -66,15 +59,10 @@ export async function POST(request: NextRequest) {
     let statementFilename: string | null = null;
     let statementPath: string | null = null;
 
-    // Handle file upload if present
     if (file && file.size > 0) {
-      // Validate file type and size
       const validation = validateFileUpload(file, 'statement');
       if (!validation.valid) {
-        return NextResponse.json(
-          { error: validation.error },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: validation.error }, { status: 400 });
       }
 
       const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -93,36 +81,30 @@ export async function POST(request: NextRequest) {
       statementPath = filePath;
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO leads (name, business_name, email, phone, monthly_volume, lead_type, statement_filename, statement_path, ip_address, page_source)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    const result = await db.execute({
+      sql: `INSERT INTO leads (name, business_name, email, phone, monthly_volume, lead_type, statement_filename, statement_path, ip_address, page_source)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        name.trim(),
+        business_name?.trim() ?? null,
+        email.trim().toLowerCase(),
+        phone?.trim() ?? null,
+        monthly_volume ?? null,
+        lead_type,
+        statementFilename,
+        statementPath,
+        ip_address,
+        page_source ?? null,
+      ],
+    });
 
-    const result = stmt.run(
-      name.trim(),
-      business_name?.trim() || null,
-      email.trim().toLowerCase(),
-      phone?.trim() || null,
-      monthly_volume || null,
-      lead_type,
-      statementFilename,
-      statementPath,
-      ip_address,
-      page_source || null
-    );
-
-    createNotification('new_lead', 'New Lead', `New ${lead_type} request from ${name}`, 'lead', result.lastInsertRowid as number);
+    const newId = Number(result.lastInsertRowid);
+    createNotification('new_lead', 'New Lead', `New ${lead_type} request from ${name}`, 'lead', newId);
     notifyNewLead(name, lead_type, email);
 
-    return NextResponse.json(
-      { success: true, id: result.lastInsertRowid },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, id: newId }, { status: 201 });
   } catch {
     serverLog({ level: 'error', category: 'form_submission', message: 'Lead submission error', request });
-    return NextResponse.json(
-      { error: 'Failed to submit lead' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to submit lead' }, { status: 500 });
   }
 }

@@ -4,14 +4,8 @@ import { requireAuth } from '@/lib/api-helpers';
 import { createNotification, logActivity } from '@/lib/notifications';
 
 const VALID_STAGES = [
-  'new_lead',
-  'contacted',
-  'fee_analysis_sent',
-  'negotiation',
-  'application_submitted',
-  'approved',
-  'installed',
-  'active_merchant',
+  'new_lead', 'contacted', 'fee_analysis_sent', 'negotiation',
+  'application_submitted', 'approved', 'installed', 'active_merchant',
 ];
 
 export async function PATCH(
@@ -39,7 +33,11 @@ export async function PATCH(
       );
     }
 
-    const merchant = db.prepare('SELECT * FROM merchants WHERE id = ?').get(merchantId) as Record<string, unknown> | undefined;
+    const merchantResult = await db.execute({
+      sql: 'SELECT * FROM merchants WHERE id = ?',
+      args: [merchantId],
+    });
+    const merchant = merchantResult.rows[0] as Record<string, unknown> | undefined;
 
     if (!merchant) {
       return NextResponse.json({ error: 'Merchant not found' }, { status: 404 });
@@ -47,17 +45,12 @@ export async function PATCH(
 
     const oldStage = merchant.pipeline_stage as string;
 
-    db.prepare(
-      "UPDATE merchants SET pipeline_stage = ?, updated_at = datetime('now') WHERE id = ?"
-    ).run(stage, merchantId);
+    await db.execute({
+      sql: "UPDATE merchants SET pipeline_stage = ?, updated_at = datetime('now') WHERE id = ?",
+      args: [stage, merchantId],
+    });
 
-    logActivity(
-      'stage_change',
-      'merchant',
-      merchantId,
-      `Stage: ${oldStage} → ${stage}`,
-      auth.userId
-    );
+    logActivity('stage_change', 'merchant', merchantId, `Stage: ${oldStage} → ${stage}`, auth.userId);
 
     if (stage === 'approved' || stage === 'active_merchant') {
       createNotification(
@@ -69,14 +62,14 @@ export async function PATCH(
       );
     }
 
-    const updatedMerchant = db.prepare('SELECT * FROM merchants WHERE id = ?').get(merchantId);
+    const updatedResult = await db.execute({
+      sql: 'SELECT * FROM merchants WHERE id = ?',
+      args: [merchantId],
+    });
 
-    return NextResponse.json({ success: true, merchant: updatedMerchant });
+    return NextResponse.json({ success: true, merchant: updatedResult.rows[0] });
   } catch (error) {
-    console.error('Error updating merchant stage:');
-    return NextResponse.json(
-      { error: 'Failed to update merchant stage' },
-      { status: 500 }
-    );
+    console.error('Error updating merchant stage:', error);
+    return NextResponse.json({ error: 'Failed to update merchant stage' }, { status: 500 });
   }
 }

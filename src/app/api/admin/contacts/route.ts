@@ -13,27 +13,23 @@ export async function GET(request: NextRequest) {
 
     const whereClause = unreadOnly ? 'WHERE read = 0' : '';
 
-    const totalRow = db.prepare(
-      `SELECT COUNT(*) as total FROM contacts ${whereClause}`
-    ).get() as { total: number };
-    const total = totalRow.total;
+    const countResult = await db.execute(`SELECT COUNT(*) as total FROM contacts ${whereClause}`);
+    const total = Number(countResult.rows[0]?.total ?? 0);
     const totalPages = Math.ceil(total / limit);
 
-    const contacts = db.prepare(
-      `SELECT * FROM contacts ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`
-    ).all(limit, offset);
+    const contactsResult = await db.execute({
+      sql: `SELECT * FROM contacts ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      args: [limit, offset],
+    });
 
     return NextResponse.json({
-      contacts,
+      contacts: contactsResult.rows,
       total,
       page,
       totalPages,
     });
   } catch (error) {
-    console.error('Error fetching contacts:');
-    return NextResponse.json(
-      { error: 'Failed to fetch contacts' },
-      { status: 500 }
-    );
+    console.error('Error fetching contacts:', error);
+    return NextResponse.json({ error: 'Failed to fetch contacts' }, { status: 500 });
   }
 }

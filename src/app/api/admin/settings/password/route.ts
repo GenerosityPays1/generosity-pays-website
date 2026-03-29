@@ -25,7 +25,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // PCI DSS 8.2.3: Require both letters and numbers
     if (!/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
       return NextResponse.json(
         { error: 'Password must contain both letters and numbers' },
@@ -34,13 +33,14 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (newPassword.length > 128) {
-      return NextResponse.json(
-        { error: 'Password exceeds maximum length' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Password exceeds maximum length' }, { status: 400 });
     }
 
-    const user = db.prepare('SELECT * FROM admin_users WHERE id = ?').get(auth.userId) as Record<string, unknown> | undefined;
+    const userResult = await db.execute({
+      sql: 'SELECT * FROM admin_users WHERE id = ?',
+      args: [auth.userId],
+    });
+    const user = userResult.rows[0] as Record<string, unknown> | undefined;
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -49,22 +49,19 @@ export async function PATCH(request: NextRequest) {
     const isValid = bcrypt.compareSync(currentPassword, user.password_hash as string);
 
     if (!isValid) {
-      return NextResponse.json(
-        { error: 'Current password is incorrect' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 });
     }
 
     const newHash = bcrypt.hashSync(newPassword, 12);
 
-    db.prepare('UPDATE admin_users SET password_hash = ? WHERE id = ?').run(newHash, auth.userId);
+    await db.execute({
+      sql: 'UPDATE admin_users SET password_hash = ? WHERE id = ?',
+      args: [newHash, auth.userId],
+    });
 
     return NextResponse.json({ success: true, message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Error updating password:');
-    return NextResponse.json(
-      { error: 'Failed to update password' },
-      { status: 500 }
-    );
+    console.error('Error updating password:', error);
+    return NextResponse.json({ error: 'Failed to update password' }, { status: 500 });
   }
 }

@@ -29,7 +29,11 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 });
     }
 
-    const lead = db.prepare('SELECT * FROM leads WHERE id = ?').get(leadId) as LeadRow | undefined;
+    const leadResult = await db.execute({
+      sql: 'SELECT * FROM leads WHERE id = ?',
+      args: [leadId],
+    });
+    const lead = leadResult.rows[0] as unknown as LeadRow | undefined;
 
     if (!lead) {
       return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
@@ -42,25 +46,25 @@ export async function POST(
       );
     }
 
-    // Create merchant record from lead data
-    const merchantResult = db.prepare(`
-      INSERT INTO merchants (lead_id, business_name, contact_name, email, phone, monthly_volume)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(
-      leadId,
-      lead.business_name || lead.name,
-      lead.name,
-      lead.email,
-      lead.phone || null,
-      lead.monthly_volume || null
-    );
+    const merchantResult = await db.execute({
+      sql: `INSERT INTO merchants (lead_id, business_name, contact_name, email, phone, monthly_volume)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [
+        leadId,
+        lead.business_name ?? lead.name,
+        lead.name,
+        lead.email,
+        lead.phone ?? null,
+        lead.monthly_volume ?? null,
+      ],
+    });
 
     const merchantId = Number(merchantResult.lastInsertRowid);
 
-    // Update lead with merchant_id and set status to qualified
-    db.prepare(
-      "UPDATE leads SET merchant_id = ?, status = 'qualified', updated_at = datetime('now') WHERE id = ?"
-    ).run(merchantId, leadId);
+    await db.execute({
+      sql: "UPDATE leads SET merchant_id = ?, status = 'qualified', updated_at = datetime('now') WHERE id = ?",
+      args: [merchantId, leadId],
+    });
 
     createNotification(
       'stage_change',
@@ -78,14 +82,17 @@ export async function POST(
       auth.userId
     );
 
-    const merchant = db.prepare('SELECT * FROM merchants WHERE id = ?').get(merchantId);
+    const merchantFetchResult = await db.execute({
+      sql: 'SELECT * FROM merchants WHERE id = ?',
+      args: [merchantId],
+    });
 
-    return NextResponse.json({ success: true, merchant }, { status: 201 });
-  } catch (error) {
-    console.error('Error converting lead:');
     return NextResponse.json(
-      { error: 'Failed to convert lead to merchant' },
-      { status: 500 }
+      { success: true, merchant: merchantFetchResult.rows[0] },
+      { status: 201 }
     );
+  } catch (error) {
+    console.error('Error converting lead:', error);
+    return NextResponse.json({ error: 'Failed to convert lead to merchant' }, { status: 500 });
   }
 }

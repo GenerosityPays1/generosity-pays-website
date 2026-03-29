@@ -17,9 +17,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid contact ID' }, { status: 400 });
     }
 
-    const existing = db.prepare('SELECT * FROM contacts WHERE id = ?').get(contactId);
+    const existingResult = await db.execute({
+      sql: 'SELECT * FROM contacts WHERE id = ?',
+      args: [contactId],
+    });
 
-    if (!existing) {
+    if (!existingResult.rows[0]) {
       return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
     }
 
@@ -43,18 +46,19 @@ export async function PATCH(
 
     values.push(contactId);
 
-    db.prepare(
-      `UPDATE contacts SET ${updates.join(', ')} WHERE id = ?`
-    ).run(...values);
+    await db.execute({
+      sql: `UPDATE contacts SET ${updates.join(', ')} WHERE id = ?`,
+      args: values,
+    });
 
-    const updatedContact = db.prepare('SELECT * FROM contacts WHERE id = ?').get(contactId);
+    const updatedResult = await db.execute({
+      sql: 'SELECT * FROM contacts WHERE id = ?',
+      args: [contactId],
+    });
 
-    return NextResponse.json({ success: true, contact: updatedContact });
+    return NextResponse.json({ success: true, contact: updatedResult.rows[0] });
   } catch (error) {
-    console.error('Error updating contact:');
-    return NextResponse.json(
-      { error: 'Failed to update contact' },
-      { status: 500 }
-    );
+    console.error('Error updating contact:', error);
+    return NextResponse.json({ error: 'Failed to update contact' }, { status: 500 });
   }
 }

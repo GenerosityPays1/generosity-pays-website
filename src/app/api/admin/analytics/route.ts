@@ -7,45 +7,38 @@ export async function GET(request: NextRequest) {
     const auth = requireAuth(request);
     if (auth instanceof NextResponse) return auth;
 
-    const leadsPerMonth = db.prepare(
-      `SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count
-       FROM leads
-       GROUP BY month
-       ORDER BY month DESC
-       LIMIT 12`
-    ).all();
-
-    const merchantsPerMonth = db.prepare(
-      `SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count
-       FROM merchants
-       GROUP BY month
-       ORDER BY month DESC
-       LIMIT 12`
-    ).all();
-
-    const pipelineFunnel = db.prepare(
-      `SELECT pipeline_stage as stage, COUNT(*) as count
-       FROM merchants
-       GROUP BY pipeline_stage`
-    ).all();
-
-    const leadSourceBreakdown = db.prepare(
-      `SELECT lead_type as type, COUNT(*) as count
-       FROM leads
-       GROUP BY lead_type`
-    ).all();
+    const [
+      leadsPerMonthResult,
+      merchantsPerMonthResult,
+      pipelineFunnelResult,
+      leadSourceBreakdownResult,
+    ] = await Promise.all([
+      db.execute(`
+        SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count
+        FROM leads GROUP BY month ORDER BY month DESC LIMIT 12
+      `),
+      db.execute(`
+        SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count
+        FROM merchants GROUP BY month ORDER BY month DESC LIMIT 12
+      `),
+      db.execute(`
+        SELECT pipeline_stage as stage, COUNT(*) as count
+        FROM merchants GROUP BY pipeline_stage
+      `),
+      db.execute(`
+        SELECT lead_type as type, COUNT(*) as count
+        FROM leads GROUP BY lead_type
+      `),
+    ]);
 
     return NextResponse.json({
-      leadsPerMonth,
-      merchantsPerMonth,
-      pipelineFunnel,
-      leadSourceBreakdown,
+      leadsPerMonth: leadsPerMonthResult.rows,
+      merchantsPerMonth: merchantsPerMonthResult.rows,
+      pipelineFunnel: pipelineFunnelResult.rows,
+      leadSourceBreakdown: leadSourceBreakdownResult.rows,
     });
   } catch (error) {
-    console.error('Error fetching analytics:');
-    return NextResponse.json(
-      { error: 'Failed to fetch analytics' },
-      { status: 500 }
-    );
+    console.error('Error fetching analytics:', error);
+    return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
   }
 }

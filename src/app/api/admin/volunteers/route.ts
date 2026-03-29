@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const search = url.searchParams.get('search') || '';
 
     const conditions: string[] = [];
-    const params: string[] = [];
+    const params: (string | number)[] = [];
 
     if (search) {
       conditions.push('(name LIKE ? OR email LIKE ?)');
@@ -21,27 +21,21 @@ export async function GET(request: NextRequest) {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const totalRow = db.prepare(
-      `SELECT COUNT(*) as total FROM volunteers ${whereClause}`
-    ).get(...params) as { total: number };
-    const total = totalRow.total;
+    const countResult = await db.execute({
+      sql: `SELECT COUNT(*) as total FROM volunteers ${whereClause}`,
+      args: params,
+    });
+    const total = Number(countResult.rows[0]?.total ?? 0);
     const totalPages = Math.ceil(total / limit);
 
-    const volunteers = db.prepare(
-      `SELECT * FROM volunteers ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`
-    ).all(...params, limit, offset);
-
-    return NextResponse.json({
-      volunteers,
-      total,
-      page,
-      totalPages,
+    const volunteersResult = await db.execute({
+      sql: `SELECT * FROM volunteers ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      args: [...params, limit, offset],
     });
+
+    return NextResponse.json({ volunteers: volunteersResult.rows, total, page, totalPages });
   } catch {
     console.error('Error fetching volunteers:');
-    return NextResponse.json(
-      { error: 'Failed to fetch volunteers' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch volunteers' }, { status: 500 });
   }
 }

@@ -30,15 +30,17 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid document ID' }, { status: 400 });
     }
 
-    const doc = db.prepare('SELECT * FROM documents WHERE id = ?').get(docId) as Record<string, unknown> | undefined;
+    const result = await db.execute({
+      sql: 'SELECT * FROM documents WHERE id = ?',
+      args: [docId],
+    });
+    const doc = result.rows[0] as Record<string, unknown> | undefined;
 
     if (!doc) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
     const filePath = doc.file_path as string;
-
-    // Ensure file path is within uploads directory (path traversal prevention)
     const uploadsDir = path.join(process.cwd(), 'uploads');
     const resolvedPath = path.resolve(filePath);
     if (!resolvedPath.startsWith(uploadsDir)) {
@@ -52,8 +54,6 @@ export async function GET(
     const fileBuffer = fs.readFileSync(resolvedPath);
     const ext = path.extname(doc.original_filename as string).toLowerCase();
     const contentType = MIME_TYPES[ext] || (doc.mime_type as string) || 'application/octet-stream';
-
-    // Sanitize filename to prevent header injection
     const safeFilename = sanitizeFilename(doc.original_filename as string);
 
     return new NextResponse(fileBuffer, {
@@ -65,11 +65,8 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error downloading document');
-    return NextResponse.json(
-      { error: 'Failed to download document' },
-      { status: 500 }
-    );
+    console.error('Error downloading document:', error);
+    return NextResponse.json({ error: 'Failed to download document' }, { status: 500 });
   }
 }
 
@@ -88,18 +85,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid document ID' }, { status: 400 });
     }
 
-    const doc = db.prepare('SELECT * FROM documents WHERE id = ?').get(docId) as Record<string, unknown> | undefined;
+    const result = await db.execute({
+      sql: 'SELECT * FROM documents WHERE id = ?',
+      args: [docId],
+    });
+    const doc = result.rows[0] as Record<string, unknown> | undefined;
 
     if (!doc) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    // Remove file from disk if it exists
     const filePath = doc.file_path as string;
     const uploadsDir = path.join(process.cwd(), 'uploads');
     const resolvedPath = path.resolve(filePath);
 
-    // Only delete if within uploads directory
     if (resolvedPath.startsWith(uploadsDir)) {
       try {
         if (fs.existsSync(resolvedPath)) {
@@ -110,16 +109,13 @@ export async function DELETE(
       }
     }
 
-    db.prepare('DELETE FROM documents WHERE id = ?').run(docId);
+    await db.execute({ sql: 'DELETE FROM documents WHERE id = ?', args: [docId] });
 
     logActivity('delete', 'document', docId, `Deleted document: ${doc.original_filename}`, auth.userId);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting document');
-    return NextResponse.json(
-      { error: 'Failed to delete document' },
-      { status: 500 }
-    );
+    console.error('Error deleting document:', error);
+    return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
   }
 }

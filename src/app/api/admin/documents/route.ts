@@ -41,28 +41,22 @@ export async function GET(request: NextRequest) {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const totalRow = db.prepare(
-      `SELECT COUNT(*) as total FROM documents ${whereClause}`
-    ).get(...params) as { total: number };
-    const total = totalRow.total;
+    const countResult = await db.execute({
+      sql: `SELECT COUNT(*) as total FROM documents ${whereClause}`,
+      args: params,
+    });
+    const total = Number(countResult.rows[0]?.total ?? 0);
     const totalPages = Math.ceil(total / limit);
 
-    const documents = db.prepare(
-      `SELECT * FROM documents ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`
-    ).all(...params, limit, offset);
-
-    return NextResponse.json({
-      documents,
-      total,
-      page,
-      totalPages,
+    const documentsResult = await db.execute({
+      sql: `SELECT * FROM documents ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      args: [...params, limit, offset],
     });
+
+    return NextResponse.json({ documents: documentsResult.rows, total, page, totalPages });
   } catch (error) {
-    console.error('Error fetching documents');
-    return NextResponse.json(
-      { error: 'Failed to fetch documents' },
-      { status: 500 }
-    );
+    console.error('Error fetching documents:', error);
+    return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 });
   }
 }
 
@@ -85,18 +79,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'entity_type is required' }, { status: 400 });
     }
 
-    // Validate entity_type
     if (!VALID_ENTITY_TYPES.has(entityType)) {
       return NextResponse.json({ error: 'Invalid entity_type' }, { status: 400 });
     }
 
-    // Validate file type and size
     const validation = validateFileUpload(file, 'document');
     if (!validation.valid) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // Validate description length
     if (description && description.length > 500) {
       return NextResponse.json({ error: 'Description too long' }, { status: 400 });
     }
@@ -113,36 +104,28 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     fs.writeFileSync(filePath, buffer);
 
-    const result = db.prepare(`
-      INSERT INTO documents (filename, original_filename, file_path, file_size, mime_type, entity_type, entity_id, description, uploaded_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      uniqueFilename,
-      file.name,
-      filePath,
-      file.size,
-      file.type || 'application/octet-stream',
-      entityType,
-      entityId ? parseInt(entityId, 10) : null,
-      description?.trim() || null,
-      auth.userId
-    );
+    const result = await db.execute({
+      sql: `INSERT INTO documents (filename, original_filename, file_path, file_size, mime_type, entity_type, entity_id, description, uploaded_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        uniqueFilename, file.name, filePath, file.size,
+        file.type || 'application/octet-stream', entityType,
+        entityId ? parseInt(entityId, 10) : null,
+        description?.trim() ?? null, auth.userId,
+      ],
+    });
 
     const docId = Number(result.lastInsertRowid);
-
     logActivity('upload', 'document', docId, `Uploaded document: ${file.name}`, auth.userId);
 
-    const document = db.prepare('SELECT * FROM documents WHERE id = ?').get(docId);
+    const documentResult = await db.execute({
+      sql: 'SELECT * FROM documents WHERE id = ?',
+      args: [docId],
+    });
 
-    return NextResponse.json(
-      { success: true, document },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, document: documentResult.rows[0] }, { status: 201 });
   } catch (error) {
-    console.error('Error uploading document');
-    return NextResponse.json(
-      { error: 'Failed to upload document' },
-      { status: 500 }
-    );
+    console.error('Error uploading document:', error);
+    return NextResponse.json({ error: 'Failed to upload document' }, { status: 500 });
   }
 }

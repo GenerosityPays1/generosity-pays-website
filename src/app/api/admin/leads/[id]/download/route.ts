@@ -33,40 +33,30 @@ export async function GET(
     const token = getTokenFromHeader(request.headers.get('authorization'));
 
     if (!token) {
-      return NextResponse.json(
-        { error: 'Authorization token required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authorization token required' }, { status: 401 });
     }
 
     try {
       verifyToken(token);
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
     const { id } = await params;
     const leadId = parseInt(id, 10);
 
     if (isNaN(leadId) || leadId < 1) {
-      return NextResponse.json(
-        { error: 'Invalid lead ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 });
     }
 
-    const lead = db
-      .prepare('SELECT id, statement_filename, statement_path FROM leads WHERE id = ?')
-      .get(leadId) as Lead | undefined;
+    const result = await db.execute({
+      sql: 'SELECT id, statement_filename, statement_path FROM leads WHERE id = ?',
+      args: [leadId],
+    });
+    const lead = result.rows[0] as unknown as Lead | undefined;
 
     if (!lead) {
-      return NextResponse.json(
-        { error: 'Lead not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
     }
 
     if (!lead.statement_path || !lead.statement_filename) {
@@ -76,28 +66,19 @@ export async function GET(
       );
     }
 
-    // Ensure file path is within uploads directory (path traversal prevention)
     const uploadsDir = path.join(process.cwd(), 'uploads');
     const resolvedPath = path.resolve(lead.statement_path);
     if (!resolvedPath.startsWith(uploadsDir)) {
-      return NextResponse.json(
-        { error: 'Invalid file path' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid file path' }, { status: 400 });
     }
 
     if (!fs.existsSync(resolvedPath)) {
-      return NextResponse.json(
-        { error: 'Statement file not found on disk' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Statement file not found on disk' }, { status: 404 });
     }
 
     const fileBuffer = fs.readFileSync(resolvedPath);
     const ext = path.extname(lead.statement_filename).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-    // Sanitize filename to prevent header injection
     const safeFilename = sanitizeFilename(lead.statement_filename);
 
     return new NextResponse(fileBuffer, {
@@ -110,10 +91,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error downloading statement');
-    return NextResponse.json(
-      { error: 'Failed to download statement' },
-      { status: 500 }
-    );
+    console.error('Error downloading statement:', error);
+    return NextResponse.json({ error: 'Failed to download statement' }, { status: 500 });
   }
 }

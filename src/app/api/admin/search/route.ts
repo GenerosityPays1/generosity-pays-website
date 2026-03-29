@@ -19,33 +19,37 @@ export async function GET(request: NextRequest) {
 
     const searchPattern = `%${q}%`;
 
-    const leads = db.prepare(
-      `SELECT id, name, business_name, email, phone, lead_type, status, created_at
-       FROM leads
-       WHERE name LIKE ? OR business_name LIKE ? OR email LIKE ? OR phone LIKE ?
-       LIMIT 5`
-    ).all(searchPattern, searchPattern, searchPattern, searchPattern);
+    const [leadsResult, merchantsResult, contactsResult] = await Promise.all([
+      db.execute({
+        sql: `SELECT id, name, business_name, email, phone, lead_type, status, created_at
+              FROM leads
+              WHERE name LIKE ? OR business_name LIKE ? OR email LIKE ? OR phone LIKE ?
+              LIMIT 5`,
+        args: [searchPattern, searchPattern, searchPattern, searchPattern],
+      }),
+      db.execute({
+        sql: `SELECT id, business_name, contact_name, email, phone, pipeline_stage, created_at
+              FROM merchants
+              WHERE business_name LIKE ? OR contact_name LIKE ? OR email LIKE ? OR phone LIKE ?
+              LIMIT 5`,
+        args: [searchPattern, searchPattern, searchPattern, searchPattern],
+      }),
+      db.execute({
+        sql: `SELECT id, name, email, message, read, created_at
+              FROM contacts
+              WHERE name LIKE ? OR email LIKE ?
+              LIMIT 5`,
+        args: [searchPattern, searchPattern],
+      }),
+    ]);
 
-    const merchants = db.prepare(
-      `SELECT id, business_name, contact_name, email, phone, pipeline_stage, created_at
-       FROM merchants
-       WHERE business_name LIKE ? OR contact_name LIKE ? OR email LIKE ? OR phone LIKE ?
-       LIMIT 5`
-    ).all(searchPattern, searchPattern, searchPattern, searchPattern);
-
-    const contacts = db.prepare(
-      `SELECT id, name, email, message, read, created_at
-       FROM contacts
-       WHERE name LIKE ? OR email LIKE ?
-       LIMIT 5`
-    ).all(searchPattern, searchPattern);
-
-    return NextResponse.json({ leads, merchants, contacts });
+    return NextResponse.json({
+      leads: leadsResult.rows,
+      merchants: merchantsResult.rows,
+      contacts: contactsResult.rows,
+    });
   } catch (error) {
-    console.error('Error searching:');
-    return NextResponse.json(
-      { error: 'Search failed' },
-      { status: 500 }
-    );
+    console.error('Error searching:', error);
+    return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }

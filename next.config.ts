@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Use 'standalone' for Docker deployments only (set NEXT_OUTPUT=standalone in Docker env)
   ...(process.env.NEXT_OUTPUT === 'standalone' ? { output: 'standalone' as const } : {}),
-  serverExternalPackages: ['better-sqlite3'],
+  serverExternalPackages: ['@libsql/client'],
   images: {
     formats: ['image/avif', 'image/webp'],
   },
