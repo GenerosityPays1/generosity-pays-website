@@ -5,15 +5,17 @@ import { FiLinkedin, FiTwitter, FiFacebook } from "react-icons/fi";
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "How It Works", href: "/#how-it-works" },
-  { label: "Solutions", href: "/#solutions" },
+  { label: "Solutions", href: "/#features" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ];
 
 const services = [
-  "Payment Processing",
+  "Credit Card Processing",
+  "Website Design",
+  "Online Ordering",
+  "Custom Solutions",
   "Fee Analysis",
-  "Merchant Solutions",
   "Charitable Giving",
 ];
 
@@ -41,10 +43,13 @@ export default function Footer() {
               />
               <h3 className="text-2xl font-bold text-white">Generosity Pays</h3>
             </div>
+            <p className="mt-3 text-xs font-medium tracking-[0.18em] uppercase text-primary/80">
+              Family-Owned &amp; Operated
+            </p>
             <p className="mt-4 text-sm leading-relaxed text-gray-400">
-              Premium payment processing with purpose. Every transaction
-              supports charitable causes that make a difference — at no
-              additional cost to your business.
+              A family-run merchant services company offering payment
+              processing, website design, and online ordering — with a portion
+              of every transaction going to the causes you care about.
             </p>
             <div className="mt-6 flex gap-4">
               {socialLinks.map(({ icon: Icon, href, label }) => (

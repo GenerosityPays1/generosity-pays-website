@@ -114,6 +114,14 @@ export default function Hero() {
           />
         </motion.div>
 
+        {/* Eyebrow */}
+        <motion.p
+          className="mb-4 text-sm md:text-base font-medium tracking-[0.2em] uppercase text-primary/80"
+          variants={fadeUpVariants}
+        >
+          Family-Owned Merchant Services
+        </motion.p>
+
         {/* Headline */}
         <motion.h1
           className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight"
@@ -130,8 +138,9 @@ export default function Hero() {
           className="mt-6 text-xl md:text-2xl text-gray-300 font-light max-w-2xl leading-relaxed"
           variants={fadeUpVariants}
         >
-          Premium payment processing that gives back to the causes you care
-          about — at no additional cost.
+          Payment processing, website design, and online ordering — built by a
+          family-run team that gives a portion of every transaction to the
+          causes you care about.
         </motion.p>
 
         {/* CTA Buttons */}

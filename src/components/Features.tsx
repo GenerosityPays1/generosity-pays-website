@@ -4,11 +4,12 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import {
-  HiShieldCheck,
-  HiEye,
+  HiCreditCard,
+  HiDesktopComputer,
+  HiShoppingCart,
+  HiCog,
+  HiUserGroup,
   HiHeart,
-  HiSupport,
-  HiSwitchHorizontal,
 } from "react-icons/hi";
 import { IconType } from "react-icons";
 import Link from "next/link";
@@ -21,34 +22,40 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    title: "Premium Processing",
+    title: "Credit Card Processing",
     description:
-      "Reliable, high-quality payment processing built for businesses that expect the best.",
-    icon: HiShieldCheck,
+      "Reliable, transparent payment processing with competitive rates and no hidden fees.",
+    icon: HiCreditCard,
   },
   {
-    title: "Transparent Pricing",
+    title: "Website Design",
     description:
-      "No hidden fees, no surprises. See exactly what you pay for.",
-    icon: HiEye,
+      "Professional, modern websites built to showcase your business and convert visitors into customers.",
+    icon: HiDesktopComputer,
   },
   {
-    title: "Charitable Impact",
+    title: "Online Ordering",
     description:
-      "Every transaction supports charitable causes — at no additional cost to your business.",
+      "Seamless online ordering integration for restaurants and retail — meet your customers where they are.",
+    icon: HiShoppingCart,
+  },
+  {
+    title: "Custom Solutions",
+    description:
+      "Tailored tech and services shaped around how your business actually runs, not a one-size-fits-all package.",
+    icon: HiCog,
+  },
+  {
+    title: "Family-Owned & Operated",
+    description:
+      "Real people who answer the phone and know your name — not a faceless corporation or overseas call center.",
+    icon: HiUserGroup,
+  },
+  {
+    title: "Give-Back Built In",
+    description:
+      "A portion of every transaction supports a nonprofit you care about — at no additional cost to your business.",
     icon: HiHeart,
-  },
-  {
-    title: "Dedicated Support",
-    description:
-      "Expert support team available when you need them most.",
-    icon: HiSupport,
-  },
-  {
-    title: "Easy Switching",
-    description:
-      "Seamless transition with zero downtime for your business.",
-    icon: HiSwitchHorizontal,
   },
 ];
 
@@ -95,10 +102,11 @@ export default function Features() {
           className="mb-16 text-center"
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Why Choose Generosity Pays
+            What We Do & Why It Matters
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-500">
-            Reliable service, transparent pricing, and a mission that matters
+            Full-service merchant solutions from a family-run team — with a
+            give-back model built into every transaction
           </p>
         </motion.div>
 
@@ -120,21 +128,10 @@ export default function Features() {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20" />
         </motion.div>
 
-        {/* Feature cards grid */}
+        {/* Feature cards grid — 3 columns × 2 rows on desktop */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {features.slice(0, 3).map((feature, index) => (
+          {features.map((feature, index) => (
             <FeatureCard key={feature.title} feature={feature} index={index} />
-          ))}
-        </div>
-
-        {/* Last 2 cards centered */}
-        <div className="mt-8 grid grid-cols-1 justify-center gap-8 sm:grid-cols-2 lg:max-w-2xl lg:mx-auto">
-          {features.slice(3).map((feature, index) => (
-            <FeatureCard
-              key={feature.title}
-              feature={feature}
-              index={index + 3}
-            />
           ))}
         </div>
 

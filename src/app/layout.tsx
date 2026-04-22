@@ -8,15 +8,17 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Generosity Pays | Premium Payment Processing With Purpose",
+  title:
+    "Generosity Pays | Family-Owned Merchant Services That Give Back",
   description:
-    "High-quality payment processing that gives back. Every transaction supports charitable causes at no additional cost to your business. Get a free analysis today.",
+    "Family-owned merchant services: credit card processing, website design, and online ordering — with a portion of every transaction supporting the causes you care about.",
   keywords:
-    "payment processing, charitable giving, merchant services, business impact, credit card processing, payment processing with purpose",
+    "family-owned merchant services, credit card processing, website design, online ordering, custom payment solutions, charitable giving, merchant services with purpose, small business payment processing",
   openGraph: {
-    title: "Generosity Pays | Premium Payment Processing With Purpose",
+    title:
+      "Generosity Pays | Family-Owned Merchant Services That Give Back",
     description:
-      "High-quality payment processing that gives back. Every transaction supports charitable causes at no additional cost to your business. Get a free analysis today.",
+      "Family-owned merchant services: credit card processing, website design, and online ordering — with a portion of every transaction supporting the causes you care about.",
     type: "website",
   },
 };
