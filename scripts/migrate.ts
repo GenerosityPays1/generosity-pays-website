@@ -197,6 +197,30 @@ async function migrate() {
     )
   `);
 
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS calculator_leads (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      business_name TEXT NOT NULL,
+      contact_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      notes TEXT,
+      monthly_volume REAL NOT NULL,
+      avg_transaction REAL NOT NULL,
+      current_rate REAL NOT NULL,
+      monthly_transactions INTEGER NOT NULL,
+      current_monthly_fees REAL NOT NULL,
+      estimated_monthly_savings REAL NOT NULL,
+      estimated_annual_savings REAL NOT NULL,
+      charity_impact REAL DEFAULT 0,
+      status TEXT DEFAULT 'new'
+        CHECK(status IN ('new','contacted','qualified','closed_won','closed_lost')),
+      ip_address TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   console.log('✓ All tables created (or already exist)');
 
   // ─── Create default admin user if none exists ─────────────────────────────

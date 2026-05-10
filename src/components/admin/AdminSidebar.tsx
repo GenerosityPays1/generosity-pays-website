@@ -17,6 +17,7 @@ import {
   HiOutlineServerStack,
   HiOutlineCog6Tooth,
   HiOutlineArrowRightOnRectangle,
+  HiOutlineCalculator,
 } from "react-icons/hi2";
 import { useAdminAuth } from "./AdminAuthProvider";
 
@@ -51,6 +52,11 @@ const navItems: NavItem[] = [
     label: "Fee Analysis",
     href: "/admin/fee-analysis",
     icon: <HiOutlineDocumentText className="w-5 h-5" />,
+  },
+  {
+    label: "Calculator Leads",
+    href: "/admin/calculator-leads",
+    icon: <HiOutlineCalculator className="w-5 h-5" />,
   },
   {
     label: "Appointments",

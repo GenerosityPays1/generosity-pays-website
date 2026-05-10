@@ -89,3 +89,10 @@ body {
 .animate-pulse-glow-purple {
   animation: pulse-glow-purple 3s ease-in-out infinite;
 }
+
+@media print {
+  header, footer, .print\:hidden { display: none !important; }
+  body { background: white !important; }
+  .print\:p-0 { padding: 0 !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
