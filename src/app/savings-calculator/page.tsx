@@ -328,8 +328,11 @@ export default function SavingsCalculatorPage() {
                         <div>
                           <label htmlFor="monthlyVolume" className={labelClass}>
                             <HiOutlineCurrencyDollar className="mr-1 inline h-4 w-4 text-primary" />
-                            Monthly Card Volume
+                            Total Monthly Sales
                           </label>
+                          <p className="text-xs text-gray-400 mb-1.5 -mt-0.5">
+                            How much do you process in card payments each month?
+                          </p>
                           <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                               $
@@ -358,8 +361,11 @@ export default function SavingsCalculatorPage() {
                             htmlFor="avgTransaction"
                             className={labelClass}
                           >
-                            Average Transaction Size
+                            Average Sale Amount
                           </label>
+                          <p className="text-xs text-gray-400 mb-1.5 -mt-0.5">
+                            What does a typical customer spend per visit?
+                          </p>
                           <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                               $
@@ -385,8 +391,11 @@ export default function SavingsCalculatorPage() {
 
                         <div>
                           <label htmlFor="currentRate" className={labelClass}>
-                            Current Processor Rate
+                            Current Processing Rate
                           </label>
+                          <p className="text-xs text-gray-400 mb-1.5 -mt-0.5">
+                            The % your processor charges per transaction
+                          </p>
                           <div className="relative">
                             <input
                               id="currentRate"
@@ -416,8 +425,11 @@ export default function SavingsCalculatorPage() {
                             htmlFor="monthlyTransactions"
                             className={labelClass}
                           >
-                            Monthly Transactions
+                            Number of Transactions per Month
                           </label>
+                          <p className="text-xs text-gray-400 mb-1.5 -mt-0.5">
+                            How many card payments do you run each month?
+                          </p>
                           <input
                             id="monthlyTransactions"
                             type="number"
@@ -1019,15 +1031,15 @@ function ResultsView({
           </h3>
           <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
             <DetailRow
-              label="Monthly Volume"
+              label="Total Monthly Sales"
               value={currency(parseFloat(calc.monthlyVolume) || 0)}
             />
             <DetailRow
-              label="Avg. Transaction"
+              label="Avg. Sale Amount"
               value={currency(parseFloat(calc.avgTransaction) || 0)}
             />
             <DetailRow
-              label="Monthly Transactions"
+              label="Transactions per Month"
               value={(
                 parseInt(calc.monthlyTransactions) || 0
               ).toLocaleString()}
