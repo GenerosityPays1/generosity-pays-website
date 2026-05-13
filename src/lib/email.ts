@@ -8,10 +8,10 @@ function getTransporter(): nodemailer.Transporter | null {
   const host = process.env.SMTP_HOST;
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const pass = process.env.SMTP_PASS?.replace(/\s/g, '');
 
-  // Gracefully skip if SMTP is not configured
   if (!host || !user || !pass) {
+    console.warn('SMTP not configured — missing', !host ? 'SMTP_HOST' : '', !user ? 'SMTP_USER' : '', !pass ? 'SMTP_PASS' : '');
     return null;
   }
 
@@ -34,8 +34,8 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
   try {
     await t.sendMail({ from, to, subject, html });
     return true;
-  } catch {
-    console.error('Failed to send email');
+  } catch (err) {
+    console.error('Failed to send email:', err instanceof Error ? err.message : err);
     return false;
   }
 }
@@ -48,7 +48,11 @@ export function notifyNewLead(name: string, leadType: string, email: string): vo
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail) return;
 
-  const typeLabel = leadType === 'fee_analysis' ? 'Fee Analysis' : 'Consultation';
+  const typeLabels: Record<string, string> = {
+    fee_analysis: 'Fee Analysis',
+    calculator: 'Savings Calculator',
+  };
+  const typeLabel = typeLabels[leadType] || 'Consultation';
 
   sendEmail(
     adminEmail,
@@ -60,7 +64,9 @@ export function notifyNewLead(name: string, leadType: string, email: string): vo
       <p><strong>Type:</strong> ${typeLabel}</p>
       <p>Log in to the <a href="${process.env.BASE_URL || ''}/admin">admin dashboard</a> to view details.</p>
     `
-  ).catch(() => {});
+  ).catch((err) => {
+    console.error('notifyNewLead email failed:', err instanceof Error ? err.message : err);
+  });
 }
 
 /**

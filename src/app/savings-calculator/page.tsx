@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, FormEvent } from "react";
+import { useState, useCallback, useRef, useEffect, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -189,9 +189,20 @@ export default function SavingsCalculatorPage() {
     }
   };
 
-  const handlePrint = () => {
+  const stepRef = useRef(step);
+  stepRef.current = step;
+
+  useEffect(() => {
+    const restoreStep = () => {
+      setStep(stepRef.current);
+    };
+    window.addEventListener("afterprint", restoreStep);
+    return () => window.removeEventListener("afterprint", restoreStep);
+  }, []);
+
+  const handlePrint = useCallback(() => {
     window.print();
-  };
+  }, []);
 
   // ─── Input classes ──────────────────────────────────────────────────────────
 
@@ -1075,13 +1086,15 @@ function ResultsView({
             switch — no pressure, no obligations.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/#contact"
+            <a
+              href="https://www.generositypays.net/#contact"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-dark shadow-lg shadow-primary/20 transition-all hover:bg-primary-dark hover:shadow-xl"
             >
               <HiOutlineCalendarDays className="h-5 w-5" />
               Schedule a Consultation
-            </Link>
+            </a>
             <button
               onClick={onPrint}
               className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-6 py-4 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50"
