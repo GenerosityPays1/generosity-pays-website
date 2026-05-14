@@ -87,14 +87,14 @@ export async function POST(request: NextRequest) {
     });
 
     const newId = Number(result.lastInsertRowid);
-    createNotification(
+    await createNotification(
       'new_lead',
       'New Calculator Lead',
       `${business_name} — $${estimated_monthly_savings.toFixed(0)}/mo potential savings`,
       'lead',
       newId
     );
-    notifyNewLead(contact_name, 'calculator', email);
+    await notifyNewLead(contact_name, 'calculator', email);
 
     return NextResponse.json({ success: true, id: newId }, { status: 201 });
   } catch {

@@ -44,9 +44,12 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
  * Notify admin of a new lead submission.
  * Fire-and-forget — never blocks the main request.
  */
-export function notifyNewLead(name: string, leadType: string, email: string): void {
+export async function notifyNewLead(name: string, leadType: string, email: string): Promise<boolean> {
   const adminEmail = process.env.ADMIN_EMAIL;
-  if (!adminEmail) return;
+  if (!adminEmail) {
+    console.warn('ADMIN_EMAIL not set — skipping lead notification');
+    return false;
+  }
 
   const typeLabels: Record<string, string> = {
     fee_analysis: 'Fee Analysis',
@@ -54,19 +57,22 @@ export function notifyNewLead(name: string, leadType: string, email: string): vo
   };
   const typeLabel = typeLabels[leadType] || 'Consultation';
 
-  sendEmail(
-    adminEmail,
-    `New ${typeLabel} Lead: ${name}`,
-    `
-      <h2>New ${typeLabel} Request</h2>
-      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-      <p><strong>Type:</strong> ${typeLabel}</p>
-      <p>Log in to the <a href="${process.env.BASE_URL || ''}/admin">admin dashboard</a> to view details.</p>
-    `
-  ).catch((err) => {
+  try {
+    return await sendEmail(
+      adminEmail,
+      `New ${typeLabel} Lead: ${name}`,
+      `
+        <h2>New ${typeLabel} Request</h2>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Type:</strong> ${typeLabel}</p>
+        <p>Log in to the <a href="${process.env.BASE_URL || ''}/admin">admin dashboard</a> to view details.</p>
+      `
+    );
+  } catch (err) {
     console.error('notifyNewLead email failed:', err instanceof Error ? err.message : err);
-  });
+    return false;
+  }
 }
 
 /**
