@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
       estimated_monthly_savings,
       estimated_annual_savings,
       charity_impact,
+      gp_rate,
     } = body;
 
     if (!contact_name || !email || !business_name) {
@@ -66,8 +67,8 @@ export async function POST(request: NextRequest) {
         business_name, contact_name, email, phone, notes,
         monthly_volume, avg_transaction, current_rate, monthly_transactions,
         current_monthly_fees, estimated_monthly_savings, estimated_annual_savings,
-        charity_impact, ip_address
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        charity_impact, gp_rate, ip_address
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         business_name.trim(),
         contact_name.trim(),
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
         estimated_monthly_savings,
         estimated_annual_savings,
         charity_impact ?? 0,
+        typeof gp_rate === 'number' ? gp_rate : 4.0,
         ip_address,
       ],
     });

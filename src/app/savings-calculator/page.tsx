@@ -27,7 +27,9 @@ import {
 
 // ─── Constants ──────────────────────────────────────────────────────────────────
 
-const GP_RATE = 2.6;
+const DEFAULT_GP_RATE = 4.0;
+const MIN_GP_RATE = 3.0;
+const GP_RATE_STEP = 0.1;
 const GP_RESIDUAL = 0.75;
 const CHARITY_DONATION_RATE = 0.10;
 
@@ -95,11 +97,11 @@ function currency(n: number) {
   });
 }
 
-function computeSavings(calc: CalcData) {
+function computeSavings(calc: CalcData, gpRate: number) {
   const vol = parseFloat(calc.monthlyVolume) || 0;
   const rate = parseFloat(calc.currentRate) || 0;
   const currentFees = vol * (rate / 100);
-  const gpFees = vol * (GP_RATE / 100);
+  const gpFees = vol * (gpRate / 100);
   const monthlySavings = Math.max(currentFees - gpFees, 0);
   const annualSavings = monthlySavings * 12;
   const monthlyDonation = gpFees * GP_RESIDUAL * CHARITY_DONATION_RATE;
@@ -117,6 +119,8 @@ export default function SavingsCalculatorPage() {
   const [submitError, setSubmitError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
+  const [gpRate, setGpRate] = useState(DEFAULT_GP_RATE);
+
   const [calc, setCalc] = useState<CalcData>({
     monthlyVolume: "",
     avgTransaction: "",
@@ -132,7 +136,7 @@ export default function SavingsCalculatorPage() {
     notes: "",
   });
 
-  const savings = computeSavings(calc);
+  const savings = computeSavings(calc, gpRate);
 
   const goNext = useCallback(() => {
     setDirection(1);
@@ -172,6 +176,7 @@ export default function SavingsCalculatorPage() {
           estimated_monthly_savings: savings.monthlySavings,
           estimated_annual_savings: savings.annualSavings,
           charity_impact: savings.monthlyDonation,
+          gp_rate: gpRate,
         }),
       });
 
@@ -459,6 +464,45 @@ export default function SavingsCalculatorPage() {
                             className={inputClass}
                           />
                         </div>
+
+                        {/* GP Rate — inline for mobile, also in sidebar for desktop */}
+                        <div className="sm:col-span-2 lg:hidden">
+                          <label className={labelClass}>Your Quoted Rate</label>
+                          <p className="text-xs text-gray-400 mb-1.5 -mt-0.5">
+                            Adjust the rate you&apos;ve been quoted
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setGpRate((r) =>
+                                  Math.max(
+                                    MIN_GP_RATE,
+                                    Math.round((r - GP_RATE_STEP) * 100) / 100
+                                  )
+                                )
+                              }
+                              disabled={gpRate <= MIN_GP_RATE}
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-white text-lg font-bold text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              &minus;
+                            </button>
+                            <span className="text-2xl font-extrabold text-primary">
+                              {gpRate.toFixed(1)}%
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setGpRate((r) =>
+                                  Math.round((r + GP_RATE_STEP) * 100) / 100
+                                )
+                              }
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-white text-lg font-bold text-primary transition-colors hover:bg-primary/10"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Live preview */}
@@ -537,13 +581,41 @@ export default function SavingsCalculatorPage() {
 
                       <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 text-center">
                         <p className="text-xs font-semibold uppercase tracking-wider text-primary/70">
-                          Our Rate
+                          Your Rate
                         </p>
-                        <p className="mt-1 text-3xl font-extrabold text-primary">
-                          {GP_RATE}%
-                        </p>
-                        <p className="mt-1 text-xs text-gray-500">
-                          Simple, flat-rate pricing
+                        <div className="mt-2 flex items-center justify-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setGpRate((r) =>
+                                Math.max(
+                                  MIN_GP_RATE,
+                                  Math.round((r - GP_RATE_STEP) * 100) / 100
+                                )
+                              )
+                            }
+                            disabled={gpRate <= MIN_GP_RATE}
+                            className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-white text-lg font-bold text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            &minus;
+                          </button>
+                          <span className="min-w-[4.5rem] text-3xl font-extrabold text-primary">
+                            {gpRate.toFixed(1)}%
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setGpRate((r) =>
+                                Math.round((r + GP_RATE_STEP) * 100) / 100
+                              )
+                            }
+                            className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-white text-lg font-bold text-primary transition-colors hover:bg-primary/10"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="mt-2 text-xs text-gray-500">
+                          Adjust your quoted rate
                         </p>
                       </div>
                     </div>
@@ -780,6 +852,7 @@ export default function SavingsCalculatorPage() {
                   calc={calc}
                   contact={contact}
                   savings={savings}
+                  gpRate={gpRate}
                   onPrint={handlePrint}
                 />
               </motion.div>
@@ -818,11 +891,13 @@ function ResultsView({
   calc,
   contact,
   savings,
+  gpRate,
   onPrint,
 }: {
   calc: CalcData;
   contact: ContactData;
   savings: ReturnType<typeof computeSavings>;
+  gpRate: number;
   onPrint: () => void;
 }) {
   const { ref: countRef, inView } = useInView({
@@ -952,7 +1027,7 @@ function ResultsView({
             />
             <BarRow
               label="Generosity Pays"
-              sublabel={`${GP_RATE}%`}
+              sublabel={`${gpRate.toFixed(1)}%`}
               value={savings.gpFees}
               max={maxBar}
               color="bg-primary"
@@ -1104,13 +1179,13 @@ function ResultsView({
           />
           <DetailRow
             label="GP Rate"
-            value={`${GP_RATE}%`}
+            value={`${gpRate.toFixed(1)}%`}
             highlight
           />
           <DetailRow
             label="Rate Savings"
             value={`${(
-              (parseFloat(calc.currentRate) || 0) - GP_RATE
+              (parseFloat(calc.currentRate) || 0) - gpRate
             ).toFixed(2)}%`}
             highlight
           />

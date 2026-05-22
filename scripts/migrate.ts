@@ -221,6 +221,13 @@ async function migrate() {
     )
   `);
 
+  // Add gp_rate column to calculator_leads if it doesn't exist
+  try {
+    await client.execute('ALTER TABLE calculator_leads ADD COLUMN gp_rate REAL DEFAULT 4.0');
+  } catch {
+    // Column already exists
+  }
+
   console.log('✓ All tables created (or already exist)');
 
   // ─── Create default admin user if none exists ─────────────────────────────
