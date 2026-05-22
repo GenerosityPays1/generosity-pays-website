@@ -1020,9 +1020,9 @@ function ResultsView({
             Your Impact Through Generosity Pays
           </h3>
           <p className="mx-auto mb-8 max-w-xl text-sm text-gray-500">
-            When you process with Generosity Pays, we donate a portion of the
-            revenue your business generates to a charity or nonprofit of your
-            choice. Here&apos;s what your partnership could mean:
+            Generosity Pays donates 10% of the revenue we earn from your
+            account directly to a charity or nonprofit of your choice.
+            Here&apos;s what your partnership could mean:
           </p>
 
           <div className="mx-auto grid max-w-2xl gap-4 sm:grid-cols-2">
