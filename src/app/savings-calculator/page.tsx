@@ -28,7 +28,8 @@ import {
 // ─── Constants ──────────────────────────────────────────────────────────────────
 
 const GP_RATE = 2.6;
-const CHARITY_PERCENT = 0.15;
+const GP_RESIDUAL = 0.75;
+const CHARITY_DONATION_RATE = 0.10;
 
 const STEPS = [
   { label: "Your Fees", icon: HiOutlineCalculator },
@@ -101,8 +102,9 @@ function computeSavings(calc: CalcData) {
   const gpFees = vol * (GP_RATE / 100);
   const monthlySavings = Math.max(currentFees - gpFees, 0);
   const annualSavings = monthlySavings * 12;
-  const charityImpact = vol * (CHARITY_PERCENT / 100) * 12;
-  return { currentFees, gpFees, monthlySavings, annualSavings, charityImpact };
+  const monthlyDonation = gpFees * GP_RESIDUAL * CHARITY_DONATION_RATE;
+  const annualDonation = monthlyDonation * 12;
+  return { currentFees, gpFees, monthlySavings, annualSavings, monthlyDonation, annualDonation };
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────────
@@ -169,7 +171,7 @@ export default function SavingsCalculatorPage() {
           current_monthly_fees: savings.currentFees,
           estimated_monthly_savings: savings.monthlySavings,
           estimated_annual_savings: savings.annualSavings,
-          charity_impact: savings.charityImpact,
+          charity_impact: savings.monthlyDonation,
         }),
       });
 
@@ -974,9 +976,9 @@ function ResultsView({
           <div className="flex items-end gap-1.5 sm:gap-2" style={{ height: 180 }}>
             {months.map((m, i) => {
               const cumSavings = savings.monthlySavings * (i + 1);
-              const height = (cumSavings / savings.annualSavings) * 100;
+              const barHeight = Math.round((cumSavings / savings.annualSavings) * 160);
               return (
-                <div key={m} className="group relative flex flex-1 flex-col items-center">
+                <div key={m} className="group relative flex flex-1 flex-col items-center justify-end" style={{ height: 180 }}>
                   <div
                     className="absolute -top-8 hidden rounded-lg bg-dark px-2 py-1 text-[10px] font-medium text-white shadow-lg group-hover:block"
                   >
@@ -984,7 +986,7 @@ function ResultsView({
                   </div>
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${height}%` }}
+                    animate={{ height: barHeight }}
                     transition={{
                       duration: 0.6,
                       delay: i * 0.05,
@@ -1008,70 +1010,110 @@ function ResultsView({
         </div>
       </div>
 
-      {/* Charity impact & details */}
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* Community impact */}
-        <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-warm p-6 shadow-sm">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <HiOutlineHeart className="h-5 w-5 text-primary" />
+      {/* Charitable Impact */}
+      <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-warm to-primary/5 p-6 shadow-sm sm:p-8">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+            <HiOutlineHeart className="h-7 w-7 text-primary" />
           </div>
-          <h3 className="mb-1 text-base font-bold text-dark">
-            Community Impact
+          <h3 className="mb-2 text-xl font-bold text-dark">
+            Your Impact Through Generosity Pays
           </h3>
-          <p className="mb-4 text-sm text-gray-500">
-            With Generosity Pays, a portion of every transaction goes back to
-            causes you care about.
+          <p className="mx-auto mb-8 max-w-xl text-sm text-gray-500">
+            When you process with Generosity Pays, we donate a portion of the
+            revenue your business generates to a charity or nonprofit of your
+            choice. Here&apos;s what your partnership could mean:
           </p>
-          <div className="rounded-xl bg-white p-4 text-center shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Estimated Annual Giving
-            </p>
-            <p className="mt-1 text-2xl font-extrabold text-primary">
-              {currency(savings.charityImpact)}
-            </p>
-            <p className="mt-1 text-xs text-gray-500">
-              directed to your chosen causes
-            </p>
-          </div>
-        </div>
 
-        {/* Processing details */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2">
-          <h3 className="mb-4 text-base font-bold text-dark">
-            Your Processing Summary
-          </h3>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
-            <DetailRow
-              label="Total Monthly Sales"
-              value={currency(parseFloat(calc.monthlyVolume) || 0)}
-            />
-            <DetailRow
-              label="Avg. Sale Amount"
-              value={currency(parseFloat(calc.avgTransaction) || 0)}
-            />
-            <DetailRow
-              label="Transactions per Month"
-              value={(
-                parseInt(calc.monthlyTransactions) || 0
-              ).toLocaleString()}
-            />
-            <DetailRow
-              label="Current Rate"
-              value={`${parseFloat(calc.currentRate).toFixed(2)}%`}
-            />
-            <DetailRow
-              label="GP Rate"
-              value={`${GP_RATE}%`}
-              highlight
-            />
-            <DetailRow
-              label="Rate Savings"
-              value={`${(
-                (parseFloat(calc.currentRate) || 0) - GP_RATE
-              ).toFixed(2)}%`}
-              highlight
-            />
+          <div className="mx-auto grid max-w-2xl gap-4 sm:grid-cols-2">
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Estimated Monthly Donation
+              </p>
+              <p className="mt-2 text-3xl font-extrabold text-primary">
+                {inView ? (
+                  <CountUp
+                    end={savings.monthlyDonation}
+                    prefix="$"
+                    separator=","
+                    decimals={0}
+                    duration={1.8}
+                  />
+                ) : (
+                  "$0"
+                )}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                donated every month to your chosen cause
+              </p>
+            </div>
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Estimated Annual Donation
+              </p>
+              <p className="mt-2 text-3xl font-extrabold text-primary">
+                {inView ? (
+                  <CountUp
+                    end={savings.annualDonation}
+                    prefix="$"
+                    separator=","
+                    decimals={0}
+                    duration={2}
+                  />
+                ) : (
+                  "$0"
+                )}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                your business could give back this year
+              </p>
+            </div>
           </div>
+
+          <p className="mx-auto mt-6 max-w-lg text-xs text-gray-400">
+            You choose the nonprofit — whether it&apos;s a local community
+            organization, the American Cancer Society, Special Olympics, or any
+            cause close to your heart.
+          </p>
+        </div>
+      </div>
+
+      {/* Processing details */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-base font-bold text-dark">
+          Your Processing Summary
+        </h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:grid-cols-3">
+          <DetailRow
+            label="Total Monthly Sales"
+            value={currency(parseFloat(calc.monthlyVolume) || 0)}
+          />
+          <DetailRow
+            label="Avg. Sale Amount"
+            value={currency(parseFloat(calc.avgTransaction) || 0)}
+          />
+          <DetailRow
+            label="Transactions per Month"
+            value={(
+              parseInt(calc.monthlyTransactions) || 0
+            ).toLocaleString()}
+          />
+          <DetailRow
+            label="Current Rate"
+            value={`${parseFloat(calc.currentRate).toFixed(2)}%`}
+          />
+          <DetailRow
+            label="GP Rate"
+            value={`${GP_RATE}%`}
+            highlight
+          />
+          <DetailRow
+            label="Rate Savings"
+            value={`${(
+              (parseFloat(calc.currentRate) || 0) - GP_RATE
+            ).toFixed(2)}%`}
+            highlight
+          />
         </div>
       </div>
 
