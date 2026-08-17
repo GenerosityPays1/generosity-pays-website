@@ -25,6 +25,7 @@ export default function ProspectingCalculatorPage() {
   const [currentCostPerTxn, setCurrentCostPerTxn] = useState("");
   const [quotedRate, setQuotedRate] = useState("");
   const [quotedCostPerTxn, setQuotedCostPerTxn] = useState("");
+  const [cashDiscount, setCashDiscount] = useState(false);
 
   const sales = parseFloat(totalMonthlySales) || 0;
   const txns = parseFloat(transactionsPerMonth) || 0;
@@ -34,7 +35,9 @@ export default function ProspectingCalculatorPage() {
   const ourPerTxn = parseFloat(quotedCostPerTxn) || 0;
 
   const currentMonthlyCost = sales * (curRate / 100) + txns * curPerTxn;
-  const quotedMonthlyCost = sales * (ourRate / 100) + txns * ourPerTxn;
+  const quotedMonthlyCost = cashDiscount
+    ? 0
+    : sales * (ourRate / 100) + txns * ourPerTxn;
   const monthlySavings = currentMonthlyCost - quotedMonthlyCost;
   const annualSavings = monthlySavings * 12;
 
@@ -53,6 +56,7 @@ export default function ProspectingCalculatorPage() {
     setCurrentCostPerTxn("");
     setQuotedRate("");
     setQuotedCostPerTxn("");
+    setCashDiscount(false);
   }
 
   return (
@@ -201,51 +205,81 @@ export default function ProspectingCalculatorPage() {
           <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-primary">
             Our Quote
           </h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="quotedRate" className={labelClass}>
-                Our Quoted Rate
-              </label>
-              <div className="relative">
-                <input
-                  id="quotedRate"
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={quotedRate}
-                  onChange={(e) => setQuotedRate(e.target.value)}
-                  className={`${inputClass} pr-8 border-primary/20 focus:border-primary`}
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  %
-                </span>
+
+          {cashDiscount ? (
+            <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-center">
+              <p className="text-sm font-semibold text-emerald-700">
+                Cash Discount / Dual Pricing Active
+              </p>
+              <p className="mt-1 text-xs text-emerald-600">
+                Processing fees are passed to card-paying customers.
+                The business pays $0 in processing fees.
+              </p>
+              <p className="mt-3 text-2xl font-extrabold text-emerald-700">
+                $0.00 / mo
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="quotedRate" className={labelClass}>
+                  Our Quoted Rate
+                </label>
+                <div className="relative">
+                  <input
+                    id="quotedRate"
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={quotedRate}
+                    onChange={(e) => setQuotedRate(e.target.value)}
+                    className={`${inputClass} pr-8 border-primary/20 focus:border-primary`}
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    %
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="quotedCostPerTxn" className={labelClass}>
+                  Our Cost / Transaction
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    $
+                  </span>
+                  <input
+                    id="quotedCostPerTxn"
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={quotedCostPerTxn}
+                    onChange={(e) => setQuotedCostPerTxn(e.target.value)}
+                    className={`${inputClass} pl-8 border-primary/20 focus:border-primary`}
+                  />
+                </div>
               </div>
             </div>
-            <div>
-              <label htmlFor="quotedCostPerTxn" className={labelClass}>
-                Our Cost / Transaction
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  $
-                </span>
-                <input
-                  id="quotedCostPerTxn"
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={quotedCostPerTxn}
-                  onChange={(e) => setQuotedCostPerTxn(e.target.value)}
-                  className={`${inputClass} pl-8 border-primary/20 focus:border-primary`}
-                />
-              </div>
-            </div>
-          </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setCashDiscount(!cashDiscount)}
+            className={`mt-4 w-full rounded-xl py-3.5 text-sm font-semibold transition-all ${
+              cashDiscount
+                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700"
+                : "bg-white border border-gray-200 text-gray-700 hover:border-primary hover:text-primary"
+            }`}
+          >
+            {cashDiscount
+              ? "Switch Back to Custom Quote"
+              : "Cash Discount / Dual Pricing — Eliminate Fees"}
+          </button>
         </div>
 
         {/* Results */}
@@ -263,7 +297,7 @@ export default function ProspectingCalculatorPage() {
                 </div>
                 <div>
                   <p className="text-xs font-medium text-primary">
-                    Our Quoted Cost/mo
+                    {cashDiscount ? "With Cash Discount" : "Our Quoted Cost/mo"}
                   </p>
                   <p className="mt-1 text-xl font-bold text-primary">
                     {currency(quotedMonthlyCost)}
@@ -338,53 +372,81 @@ export default function ProspectingCalculatorPage() {
               <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
                 Breakdown
               </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Rate savings</span>
-                  <span className="font-semibold text-gray-700">
-                    {pct(curRate)} → {pct(ourRate)}{" "}
-                    <span
-                      className={
-                        curRate > ourRate ? "text-emerald-600" : "text-red-500"
-                      }
-                    >
-                      ({curRate > ourRate ? "−" : "+"}
-                      {pct(Math.abs(curRate - ourRate))})
+              {cashDiscount ? (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Current rate fees/mo</span>
+                    <span className="font-semibold text-gray-700">
+                      {currency(sales * (curRate / 100))}
                     </span>
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Rate cost difference/mo</span>
-                  <span className="font-semibold text-gray-700">
-                    {currency(sales * (curRate / 100) - sales * (ourRate / 100))}
-                  </span>
-                </div>
-                <div className="border-t border-gray-100 pt-2" />
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Per-txn savings</span>
-                  <span className="font-semibold text-gray-700">
-                    ${curPerTxn.toFixed(2)} → ${ourPerTxn.toFixed(2)}{" "}
-                    <span
-                      className={
-                        curPerTxn > ourPerTxn
-                          ? "text-emerald-600"
-                          : "text-red-500"
-                      }
-                    >
-                      ({curPerTxn > ourPerTxn ? "−" : "+"}$
-                      {Math.abs(curPerTxn - ourPerTxn).toFixed(2)})
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Current per-txn fees/mo</span>
+                    <span className="font-semibold text-gray-700">
+                      {currency(txns * curPerTxn)}
                     </span>
-                  </span>
+                  </div>
+                  <div className="border-t border-gray-100 pt-2" />
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">With cash discount</span>
+                    <span className="font-semibold text-emerald-600">
+                      $0.00
+                    </span>
+                  </div>
+                  <div className="mt-2 rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
+                    Card-paying customers cover the processing fee. The business
+                    keeps 100% of every sale.
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">
-                    Per-txn cost difference/mo
-                  </span>
-                  <span className="font-semibold text-gray-700">
-                    {currency(txns * curPerTxn - txns * ourPerTxn)}
-                  </span>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Rate savings</span>
+                    <span className="font-semibold text-gray-700">
+                      {pct(curRate)} → {pct(ourRate)}{" "}
+                      <span
+                        className={
+                          curRate > ourRate ? "text-emerald-600" : "text-red-500"
+                        }
+                      >
+                        ({curRate > ourRate ? "−" : "+"}
+                        {pct(Math.abs(curRate - ourRate))})
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Rate cost difference/mo</span>
+                    <span className="font-semibold text-gray-700">
+                      {currency(sales * (curRate / 100) - sales * (ourRate / 100))}
+                    </span>
+                  </div>
+                  <div className="border-t border-gray-100 pt-2" />
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Per-txn savings</span>
+                    <span className="font-semibold text-gray-700">
+                      ${curPerTxn.toFixed(2)} → ${ourPerTxn.toFixed(2)}{" "}
+                      <span
+                        className={
+                          curPerTxn > ourPerTxn
+                            ? "text-emerald-600"
+                            : "text-red-500"
+                        }
+                      >
+                        ({curPerTxn > ourPerTxn ? "−" : "+"}$
+                        {Math.abs(curPerTxn - ourPerTxn).toFixed(2)})
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      Per-txn cost difference/mo
+                    </span>
+                    <span className="font-semibold text-gray-700">
+                      {currency(txns * curPerTxn - txns * ourPerTxn)}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
