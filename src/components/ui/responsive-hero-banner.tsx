@@ -90,6 +90,8 @@ export default function ResponsiveHeroBanner({
 
       {/* Layered overlays for depth + legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/85" />
+      {/* Top vignette so nav text stays readable over bright ceiling areas */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
       <div
         className="pointer-events-none absolute inset-0"
         style={{
